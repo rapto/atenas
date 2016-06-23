@@ -1,0 +1,28 @@
+{% extends "candidaturas.html" %}
+{% load static %}
+
+{%block alt_js%}
+<script type="text/javascript" src="{% static "jquery.simplyCountable.js" %}"></script>
+<script type="text/javascript" src="{% static "atenas.js" %}"></script>
+<script type="text/javascript">
+$(document).ready(inicializaContadores);
+</script>
+{% endblock %}
+
+{%block body%}
+<form method="post" id="alta_candidato" enctype="multipart/form-data" 
+onsubmit="return verificarDatos();">
+	{% csrf_token %}
+	<table>
+	
+	    {% for field in form %} 
+	        <tr><td>{{ field.label_tag }}{% if field.field.required %}*{% endif %}</td> 
+	        <td>{{ field.errors }}{{ field }}</td> 	        </tr>
+	    {% endfor %} 
+
+	
+	</table>
+	<input type="submit" value="Enviar candidatura" />
+</form>
+
+{% endblock %}

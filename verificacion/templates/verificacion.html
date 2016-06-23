@@ -1,0 +1,87 @@
+﻿{% extends "base.html" %}
+
+{% block title %}..:: {{user}}@Atenas ::.. verificación y registro de votantes/validació i registre de votants{% endblock %}
+{% block title2 %}..:: {{user}}@Atenas ::..<br />verificación y registro de votantes<br>validació i registre de votants{% endblock %}
+
+{%block body%}
+<div style="float:right; width:30%;">
+<table border="border">
+        <tr>
+        <th>circunscripción<br />circumscripció</th><th>nº papeletas verificadas<br /></th>
+        </tr>
+        {%for circ in circunscripciones%}
+            <tr>
+            	<td>{{circ}}</td>
+		<td style="text-align:center;">{{circ.cuentaPapeletasVerificadas}}</td>
+            </tr>
+        {%endfor%}
+</table>
+</div>
+<form action=".">
+<input name="buscado" id="buscado" value="{{buscado}}">
+<input type="submit" value="buscar">
+</form >
+<div style="clear:left;"><br/></div>
+
+{% if buscado%}
+    {% if res%}
+    <table border="1px" >
+        <tr>
+            <th>apellidos, nombre / cognoms, nom</th>
+            <th>nº</th>
+            <th>nº antiguo / nº antic</th>
+            <th>doc. oficial</th>
+            <th>circunscripción / circumscripció</th>
+            <th>¿puede votar? / pot votar?</th>
+        </tr>
+        {% for r in res%}
+        <tr>
+            <td><a href="./registrar/{{r.id}}/">{{r}}</a></td>
+            <td> {{r.num_socio}}</td>
+            <td> {{r.num_socio_antiguo}}</td>
+            <td> {{r.docu_id}}</td>
+            <td> {%if r.circunscripcion%}
+                {{r.circunscripcion}}
+            {%else%}
+                Extranjero
+                {%if r.circunscripcion_voto%}
+                ({{r.circunscripcion_voto}})
+                {%endif%}
+            {%endif%}
+            </td>
+            <td>
+            {%if not r.puedeVotar.0%} NO: 
+            {%else%}
+                {%if not r.puedeVotar.1%}
+                    Sí
+                {%endif%}
+            {%endif%}
+            {{r.puedeVotar.1}}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else%}
+    sin resultados/sense resultats
+    {% endif %}
+{% endif %}
+<p/>
+<div class="menu" style="clear:both;">
+{% if ultimosocio %}
+<form action="./registroKO/{{ ultimosocio.id }}/" method="POST">
+{% csrf_token %}
+    Último voto registrado: {{ ultimosocio }} {{ ultimosocio.num_socio }}
+    <input type="submit" value="Anular" 
+        onclick="return confirm('¿Confirma la ANULACIÓN del voto?')"
+        />
+</form>
+<br/>
+{% endif %}
+
+<a href="/atenas_{{tipo}}/">volver a menú principal/tornar a menú principal</a><br/>
+</div >
+<div class="menu">
+<a href="/atenas/logout/?next=/atenas_{{tipo}}/">cerrar sesión/tancar sessió</a><br>
+</div >
+
+{% endblock %}

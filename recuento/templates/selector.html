@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %}..:: {{user}}@Atenas ::.. selector de circunscripciones/selector de circumscripcions{% endblock %}
+{% block title2 %}..:: {{user}}@Atenas ::..<br />selector de circunscripciones<br>selector de circumscripcions{% endblock %}
+ 
+{%block body%}
+<table border="border">
+<tbody>
+<tr>
+    <th>Circunscripción</th>
+    <th>Socios</th>
+    <th>Papeletas ver.</th>
+    <th>Papeletas rec.</th>
+    <th>Nulo</th>
+    <th>Blanco</th>
+    <th>Participación</th>
+</tr>
+{% for circ in ccaa %}
+<tr>
+    <td><a href="../papeleta/{{ circ.id }}/">{{ circ.ds }}</a></td>
+    <td style="text-align:right;">{{circ.cuentaVotantes|intcomma}}</td>
+    <td style="text-align:right;">{{circ.cuentaPapeletasVerificadas}}</td>
+    <td style="text-align:right;">{{circ.cuentaPapeletas}}</td>
+    <td style="text-align:right;">{{circ.cuentaVotoNulo}}</td>
+    <td style="text-align:right;">{{circ.cuentaVotoBlanco}}</td>
+    <td style="text-align:right;">{{circ.indiceParticipacion}}%</td>
+</tr>
+{% endfor%}
+</tbody>
+</table>
+
+<div style="column-count: 2;" >
+{% for circ in ccaa %}
+<h2>{{circ}}</h2>
+<table border="border">
+{%for c in circ.candidatos_ordenados_por_voto %}
+<tr>
+    <td style="text-align:right;">{{forloop.counter}}&ordm;</td>
+    <td {%if c.electo%}style="font-weight:bold;"{%endif%}>{{c.nombre}} {{c.apellidos}}</td>
+    <td style="text-align:right;">{{c.cuentaVotos}}</td>
+</tr>
+{%endfor%}
+</table>
+{%endfor%}
+</div >
+<br />
+<a href="/atenas_{{tipo}}/">volver a menú principal/tornar a menú principal</a>
+<br><a href="/atenas/logout/?next=/atenas_{{tipo}}/">cerrar sesión/tancar sessió</a>
+{%endblock%}

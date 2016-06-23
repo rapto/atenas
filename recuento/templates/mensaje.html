@@ -1,0 +1,9 @@
+{% extends "selector.html" %}
+{% block title %}..:: {{user}}@Atenas ::.. Mensaje informativo{% endblock %}
+{% block title2 %}..:: {{user}}@Atenas ::..<br />Mensaje informativo{% endblock %}
+ 
+{%block body%}
+{{mensaje}}
+<br />
+<a href="/atenas_{{tipo}}/" >Volver a pantalla inicial</a>
+{% endblock %}

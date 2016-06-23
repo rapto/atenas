@@ -1,0 +1,33 @@
+html {
+    background-color: #ffe752;
+}
+body {
+    margin: 8px;
+    background-color: #EEA;
+    padding: 8px;
+}
+#papel {
+    padding: 0px;
+}
+h1 {
+    margin: 0px;
+    font-size: 120%;
+    white-space: nowrap;
+}
+
+input {
+  border: 1px solid #663;
+}
+table {
+  font-size: 80%;
+  border: 1px solid #663;
+  border-collapse: collapse;
+}
+
+li{
+    list-style:none
+}
+
+.menu{
+    margin: 11px ;
+    }

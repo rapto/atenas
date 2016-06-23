@@ -1,0 +1,35 @@
+{% extends "base_verde.html" %}
+{% load thumbnail %}
+
+{%block title2%}
+Elecciones al Consejo de Greenpeace España - Candidaturas
+{% endblock %}
+
+{%block body%}
+<div><a href="javascript:window.close()">[X] Cerrar ventana</a></div>
+{% for circ, candidatos in ccaa %}
+	{% if circ.pk != 18 %}
+	<h3>{{circ}}</h3>
+	{% endif %}
+<table class="alegaciones">
+<thead>
+</thead>
+<tbody>
+	{% for candidato in candidatos %}
+	<tr>
+	<td class="foto">{% if candidato.foto %}<img src="{% thumbnail candidato.foto 100x100 %}">{% endif %}</td>
+	<td class="nombre"><div class="nombre">{{ candidato }}</div>
+		<div>Localidad: {{ candidato.localidad }}</div>
+		<div>Antigüedad en la asociación: {{ candidato.fecha_alta|date:"Y" }}</div>
+		<div>{{ candidato.descripcion|linebreaks }}</div>
+		{% if candidato.presenta %} <div>Presentado por {{ candidato.presenta }}</div> {% endif %}
+		</td>
+	<td class="cv">{{ candidato.cv|linebreaks }}</td>
+	<td class="vinculacion">{{ candidato.vinculacion|linebreaks }}</td>
+	<td class="campanha">{{ candidato.campanha|linebreaks }}</td>
+	</tr>
+	{% endfor %}
+	</tbody>
+</table>
+{% endfor %}
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends "base_verde.html" %}
+{% load humanize %}
+{% block title %}{{modulo}}{% endblock %}
+{% block title2 %}{{modulo}}{% endblock %}
+ 
+{%block body%}
+{% for circ in ccaa %}
+{% if circ.id != 18 %}
+<h2>{{circ}}</h2>
+{% endif %}
+<table class="resultados">
+{%for c in circ.candidatos_ordenados_por_voto %}
+<tr>
+    <td style="text-align:right;">{{forloop.counter}}&ordm;</td>
+    <td {%if c.electo%}class="electo"{%endif%}>{%if c.electo%}✓{%endif%}{{c.nombre}} {{c.apellidos}}</td>
+    <td style="text-align:right;">{{c.cuentaVotos}}</td>
+</tr>
+{%endfor%}
+</table>
+{%endfor%}
+{%endblock%}

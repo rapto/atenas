@@ -1,0 +1,11 @@
+{% extends "base_verde.html" %}
+{%block title2%}
+Elecciones al Consejo de Greenpeace España
+{% endblock %}
+{%block body%}
+{% for modulo in modulos %}
+<div class='modulo'>
+	<a href="./{{modulo.modulo}}/">{{modulo.ds}}</a>
+	</div>
+{% endfor %}
+{% endblock %}

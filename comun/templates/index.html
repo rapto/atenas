@@ -1,0 +1,18 @@
+﻿{% extends "base.html" %}
+
+{% block title %}..:: {{user}}@Atenas ::.. gesti&oacute;n de elecciones/gestió d'eleccions {% endblock %}
+{% block title2 %}..:: {{user}}@Atenas ::..<br />gesti&oacute;n de elecciones<br />gestió d'eleccions {% endblock %}
+
+{%block body%}
+<ul>
+{% if perms.verificacion.can_verify %}
+<li><a href="./verificacion/">validación y registro de votantes/validació i registre de votants</a></li>
+{% endif %}
+{% if perms.recuento.can_register_ballot %}
+<li><a href="./recuento/">recuento/recompte</a></li>
+{% endif %}
+
+<li><a target="_new" href="/atenas/adminatenas/password_change/">cambiar contraseña</a></li>
+<li><a href="/atenas/logout/?next=/atenas_{{tipo}}/">cerrar sesi&oacute;n/tancar sessió</a></li>
+</ul>
+{% endblock %}

@@ -1,0 +1,15 @@
+{% extends "base_verde.html" %}
+{%block title2%}
+Elecciones al Consejo de Greenpeace España - Editar candidato
+{% endblock %}
+
+
+{%block body%}
+<form method="post" enctype="multipart/form-data">
+<table>
+{{ form }}
+</table>
+{% csrf_token %}
+<input type="submit" value="guardar datos" />
+</form>
+{% endblock %}

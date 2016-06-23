@@ -1,0 +1,11 @@
+{% extends "base_verde.html" %}
+{% block title %}Mensaje informativo{% endblock %}
+{% block title2 %}Mensaje informativo{% endblock %}
+ 
+{%block body%}
+{{mensaje}}
+<br />
+{% if not final %}
+<a href="/" >Volver a pantalla inicial</a>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,40 @@
+﻿{% extends "base.html" %}
+
+{% block title %}..:: {{user}}@Atenas ::.. validación y registro de votantes/validació i registre de votants{% endblock %}
+{% block title2 %}..:: {{user}}@Atenas ::..<br />validación y registro de votantes<br>validació i registre de votants{% endblock %}
+
+{%block body%}
+<div style="clear:left;"></div>
+
+detalle/detall
+<table border="border">
+<tr><td>apellidos / cognoms</td><td>{{socio.apellidos}}</td></td>
+<tr><td>nombre / nom</td><td>{{socio.nombre}}</td></td>
+<tr><td>número</td><td>{{socio.num_socio}}</td></td>
+<tr><td>número antiguo / nombre antic</td><td>{{socio.num_socio_antiguo}}</td></td>
+<tr><td>documento oficial / document oficial</td><td>{{socio.docu_id}}</td></td>
+<tr><td>Fecha nacimiento/ XXX</td><td>{{socio.fecha_nacimiento_legible}}</td></td>
+<tr><td>circunscripción / circumscripció</td><td><span style="font-size:150%;">{{socio.circunscripcion|default_if_none:"Extranjero"}}</span></td></td>
+</table>
+{%if socio.puedeVotar.0%}
+<form action="./ok/" method="POST" >
+{%if socio.circunscripcion == 18 %}
+    <select id="id_circunscripcion_voto" class="vNullSelectField" name="circunscripcion_voto" size="1">
+        {%for circ in circunscripciones%}
+        <option value="{{circ.id}}" >{{circ}}</option>{%endfor%}
+    </select>
+{% else %}
+    <input type="hidden" name="circunscripcion_voto" value="{{socio.circunscripcion.id}}" />
+{% endif %}
+<input type="submit" value="registrar voto/registrar vot" onclick="return confirm('¿Confirma el voto? {{socio.puedeVotar.1}}')">
+{% csrf_token %}
+</form>
+{% else %}
+esta persona no puede votar/aquesta persona no pot votar:<br>
+{{ socio.puedeVotar.1}}
+{% endif %}
+<p><a href="../../">volver a búsqueda/tornar a recerca</a></p>
+<p><a href="../../../">volver a menú principal/tornar a menú principal</a></p>
+<p><a href="/atenas/logout/?next=/atenas_{{tipo}}/">cerrar sesión/tancar sessió</a></p>
+
+{% endblock %}

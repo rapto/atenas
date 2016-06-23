@@ -1,0 +1,41 @@
+{% extends "base_verde.html" %}
+{%block title%}Greenpeace - Sistema de votación electrónica{%endblock%}
+{%block title2%}Greenpeace España - Elecciones al Consejo{%endblock%}
+{%block body%}
+<h2 style="clear:both;"> Ver las candidaturas</h2>
+<div><a href="/ver_candidatos_{{tipo}}/" target="_blank">Pincha aquí</a> para ver las candidaturas.</div>
+<h2 style="clear:both;"> Necesito un código para votar</h2>
+<form method="post" action="/envia_clave_{{tipo}}/">
+{% csrf_token %}
+<table>
+	<tr>
+		<td style="text-align:right;" ><labelfor="usu" >Introduce tu dirección de correo electrónico:</label></td>
+		<td><input id="email" name="email"/></td>
+	</tr>
+	<tr>
+	<td></td><td><input value="Solicitar código" type="submit"></td>
+	</tr>
+</table>
+</form>
+<p>
+{{mensaje1}}	
+</p>
+<h2>Ya tengo un código para votar</h2>
+<form method="post">
+{% csrf_token %}
+<table style="clear:both;">
+	<tr>
+		<td style="text-align:right;" ><labelfor="usu" >Introduce el código que has recibido:</label></td>
+		<td><input id="clave" name="clave" autocomplete="off"/></td>
+	</tr>
+	<tr>
+	<td></td><td><input value="Aceptar" type="submit"></td>
+	</tr>
+</table>
+</form>
+<p>
+{% autoescape off %}
+{{mensaje}}	
+{% endautoescape %}
+</p>
+{%endblock%}

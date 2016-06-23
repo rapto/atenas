@@ -1,0 +1,20 @@
+{% extends "base_verde.html" %}
+{% load humanize %}
+{% block title %}selector de circunscripciones{% endblock %}
+{% block title2 %}selector de circunscripciones{% endblock %}
+ 
+{%block body%}
+<table border="border">
+<tbody>
+{% for circ in ccaa %}
+{% if circ.id != 18 %}
+<tr>
+    <td><a href="/papeleta_50/{{ circ.id }}/">{{ circ.ds }}</a></td>
+</tr>
+{% endif %}
+{% endfor%}
+</tbody>
+</table>
+No estás preasignado a ninguna circunscripción; por favor selecciona la circunscripción por la quse quieres votar.
+<br />
+{%endblock%}

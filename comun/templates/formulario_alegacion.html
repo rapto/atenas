@@ -1,0 +1,15 @@
+{% extends "base_verde.html" %}
+{%block title2%}
+Elecciones al Consejo de Greenpeace España - Plazo de alegaciones
+{% endblock %}
+
+
+{%block body%}
+<h3>Introduce tu alegación para la candidatura de {{candidato}}</h3>
+<div>{{ form.alegacion.errors }}</div>
+<form method="post">
+{{ form.alegacion }}
+{% csrf_token %}
+<input type="submit" value="enviar" />
+</form>
+{% endblock %}

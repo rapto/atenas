@@ -1,0 +1,81 @@
+{% extends "base_verde.html" %}
+{% load thumbnail %}
+
+{%block title2%}
+Elecciones al Consejo de Greenpeace España - Gestión de candidaturas
+{% endblock %}
+
+{%block body%}
+<h2>Candidaturas provisionalmente válidas</h2>
+{% for circ, candidatos in ccaa %}
+    {% if circ.pk != 18 %}
+    <h3>{{circ}}</h3>
+    {% endif %}
+
+    {% for candidato in candidatos %}
+    <p>
+    <p class="foto">{% if candidato.foto %}<img src="{% thumbnail candidato.foto 100x100 %}">{% endif %}</p>
+    <p class="nombre"><span class="nombre"><a href="./{{candidato.id}}/">{{ candidato }}</a></span>
+        <span><a href="mailto:{{candidato.correo_e}}">{{candidato.correo_e}}</a></span>
+        <span>Localidad: {{ candidato.localidad }}</span>
+        {% if candidato.presenta %} <p>Presentado por {{ candidato.presenta }}</span> {% endif %}
+        </span>
+    </p>
+    <p>Antigüedad en la asociación: {{ candidato.fecha_alta|date:"Y" }}</p>
+
+    <h4>cv</h4>
+    <p class="cv">{{ candidato.cv|linebreaks }}</p>
+    <h4>vinculacion</h4>
+    <p class="vinculacion">{{ candidato.vinculacion|linebreaks }}</p>
+    <h4>motivación</h4>
+    <p class="motivacion">{{ candidato.motivacion|linebreaks }}</p>
+    <h4>Campaña sugerida</h4>
+    <p class="campanha">{{ candidato.campanha|linebreaks }}</p>
+    <p class="participacion_activa">{{ candidato.participacion_activa  | yesno:"☑,☐,?" }} Participación activa</p>
+    <p class="veracidad">{{ candidato.veracidad  | yesno:"☑,☐,?" }} Fe de veracidad</p>
+    <p class="en_el_consejo">{{ candidato.en_el_consejo | yesno:"☑,☐,?" }} En el Consejo actualmente</p>
+    {% if candidato.en_el_consejo %}
+    <h4>Asistencia</h4>
+    <ul>{% for it in candidato.asistencia.all %}<li>{{it}}</li>{% endfor %}</ul>
+    <h4>Grupos</h4>
+    <ul>{% for it in candidato.grupos.all %}<li>{{it}}</li>{% endfor %}</ul>
+    </p>
+    <p class="frecuencia_acceso">Frecuencia de acceso: {{ candidato.get_frecuencia_acceso_display }}</p>
+    <p class="aportacion">Valoración: {{ candidato.aportacion }}</p>
+    {% endif %}
+    {% endfor %}
+
+{% endfor %}
+<h2>Candidaturas provisionalmente no válidas</h2>
+<table class="alegaciones">
+<thead>
+</thead>
+<tbody>
+    {% for candidato in candidatos_novalida %}
+    <tr>
+    <td class="foto">{% if candidato.foto %}<img src="{% thumbnail candidato.foto 100x100 %}">{% endif %}</td>
+    <td class="nombrelargo"><div class="nombre"><a href="./{{candidato.id}}/">{{ candidato }}</a></div>
+        <a href="mailto:{{candidato.correo_e}}">{{candidato.correo_e}}</a>
+        </td>
+    <td class="comentarios">{{ candidato.comentarios }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+<h2>Candidaturas pendientes</h2>
+<table class="alegaciones">
+<thead>
+</thead>
+<tbody>
+    {% for candidato in candidatos_pendiente %}
+    <tr>
+    <td class="foto">{% if candidato.foto %}<img src="{% thumbnail candidato.foto 100x100 %}">{% endif %}</td>
+    <td class="nombrelargo"><div class="nombre"><a href="./{{candidato.id}}/">{{ candidato }}</a></div>
+        <a href="mailto:{{candidato.correo_e}}">{{candidato.correo_e}}</a>
+        </td>
+    <td class="comentarios">{{ candidato.comentarios }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

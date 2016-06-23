@@ -1,0 +1,115 @@
+{% extends "selector.html" %}
+
+{%block title%}..:: Atenas ::.. registro de voto/registre de vot{%endblock%}
+{%block title2%}registro de voto/registre de vot <br />
+{{circ}} ({{puestos}} consejeros máx){%endblock%}
+
+{%block body%}
+<script type="text/javascript" >
+function confirmaVoto(){
+    var puestos={{puestos}}
+    var marcas=0
+    var frm=document.getElementById('frm')
+    for(var i=0;i<frm.elements.length;i++){
+        var elem=frm.elements[i]
+        if(elem.name.split('_')[0]=='cdto' && elem.checked){
+            marcas++
+        }
+    }
+    if (marcas>puestos){
+        alert('Hay demasiados (más de '+puestos+') candidatos marcados.')
+        return false
+    }
+    var tipo='normal'
+	var nulo=document.getElementById('nulo')
+	nulo = nulo && nulo.checked
+	var blanco=document.getElementById('blanco').checked
+    if (nulo && blanco){
+        alert('Se han marcado las casillas de nulo y blanco a la vez.\nPor favor, marque sólo una de ellas como máximo.')
+        return false
+    }
+    if (nulo){
+        tipo='nulo'
+    }
+    if (blanco){
+        tipo='blanco'
+    }
+    if (marcas==0 && tipo=='normal'){
+        alert('No se marcado ningún candidato. Si es correcto, registre el voto en blanco con el botón a tal efecto.')
+        return false
+    }
+    if (marcas>0 && tipo!='normal'){
+        alert('Desmarque todos los candidatos para marcar un voto blanco.')
+        return false
+    }
+    if (tipo=='normal'){
+        return confirm('¿Desea registrar el voto ('+marcas+' candidat*s de '+puestos+' posibles)?')
+    }
+    if (tipo=='nulo'){
+        return confirm('¿Desea registrar un VOTO NULO?')
+    }
+    if (tipo=='blanco'){
+        return confirm('¿Desea registrar un VOTO EN BLANCO?')
+    }
+    return false //no debería llegar aquí
+}
+</script>
+<div style="clear:both;"></div>
+
+
+<div style="float:right;">
+<table border="border">
+{%for c in circ.candidatos_ordenados_por_voto %}
+<tr>
+    <td style="text-align:right;">{{forloop.counter}}&ordm;</td>
+    <td {%if c.electo%}style="font-weight:bold;"{%endif%}>{{c.nombre}} {{c.apellidos}}</td>
+    <td style="text-align:right;">{{c.cuentaVotos}}</td>
+</tr>
+{%endfor%}
+</table>
+</div>
+{{cruces}}
+<form id="frm" method="post" action="./registrar/" style="display:inline;">
+{% csrf_token %}
+<ul>
+{%for c in circ.candidatos_ordenados %}
+<li><label><input name="cdto_{{c.id}}" value={{c.id}} type="checkbox"
+{% if c.pk in cruces %} checked="checked"
+{% endif %}
+> {{c.nombre}} {{c.apellidos}} </label></li>
+{%endfor%}
+<br />
+{% if user.is_authenticated %}
+  <li><label><input name="nulo" id="nulo" value="nulo" type="checkbox"> Voto nulo </label></li>
+{% endif %}
+  <li><label><input name="blanco" id="blanco" value="blanco" type="checkbox"> Voto en blanco </label></li>
+</ul>
+  <input name="submit" value="registrar" type="submit" onclick="return confirmaVoto()">
+  <input type="reset" value="desmarcar todo" ">
+</form>
+<br />
+<br />
+{%if ultimo%}
+<br />
+<form action="/atenas_{{tipo}}/papeleta/anular/{{circ.id}}/" method="POST">
+{% csrf_token %}
+Última papeleta registrada:<br />
+{{ultimo.voto_nulo|yesno:"NULO,"}}  {{ultimo.voto_blanco|yesno:"EN BLANCO,"}}  {{ultimo.fecha_registro|date:"H:i d-m-Y"}} <br />
+{% for c in ultimo.listaCandidatos%}{{c.candidato}} - {%endfor%}<br />
+<input type="submit" value="anular papeleta" onclick="return confirm('¿Desea anular la última papeleta?')">
+<input type="hidden" name="ultimo" value="{{ultimo.id}}">
+</form>
+<br />
+{%endif%}
+
+{% if user.is_authenticated %}
+<a href="../../recuento/">seleccionar otra circunscripción/seleccionar altra circumscripció</a>
+<br />
+<a href="/atenas_{{tipo}}/">volver a menú principal/tornar a menú principal</a>
+
+<br><a href="/atenas/logout/?next=/atenas_{{tipo}}/">cerrar sesión/tancar sessió</a>
+{%else%}
+<a href=".">olvidar clave</a>
+{%endif%}
+{%endblock%}
+

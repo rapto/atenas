@@ -1,0 +1,95 @@
+{% extends "base_verde.html" %}
+{% load thumbnail %}
+
+{%block title%}..:: Atenas ::.. registro de voto{%endblock%}
+{%block title2%}registro de voto <br />
+{{circ}} (elige un máximo de {{max_candidatos}} candidatos/as){%endblock%}
+
+{%block body%}
+<script type="text/javascript" >
+function confirmaVoto(){
+    var puestos={{max_candidatos}}
+    var marcas=0
+    var frm=document.getElementById('frm')
+    for(var i=0;i<frm.elements.length;i++){
+        var elem=frm.elements[i]
+        if(elem.name.split('_')[0]=='cdto' && elem.checked){
+            marcas++
+        }
+    }
+    if (marcas>puestos){
+        alert('Hay demasiados (más de '+puestos+') candidatos marcados.')
+        return false
+    }
+    var tipo='normal'
+	var nulo=document.getElementById('nulo')
+	nulo = nulo && nulo.checked
+	var blanco=document.getElementById('blanco').checked
+    if (nulo && blanco){
+        alert('Se han marcado las casillas de nulo y blanco a la vez.\nPor favor, marque sólo una de ellas como máximo.')
+        return false
+    }
+    if (nulo){
+        tipo='nulo'
+    }
+    if (blanco){
+        tipo='blanco'
+    }
+    if (marcas==0 && tipo=='normal'){
+        alert('No se marcado ningún candidato. Si es correcto, registre el voto en blanco con el botón a tal efecto.')
+        return false
+    }
+    if (marcas>0 && tipo!='normal'){
+        alert('Desmarque todos los candidatos para marcar un voto blanco.')
+        return false
+    }
+    if (tipo=='normal'){
+        return confirm('¿Desea registrar el voto ('+marcas+' candidat*s de '+puestos+' posibles)?')
+    }
+    if (tipo=='nulo'){
+        return confirm('¿Desea registrar un VOTO NULO?')
+    }
+    if (tipo=='blanco'){
+        return confirm('¿Desea registrar un VOTO EN BLANCO?')
+    }
+    return false //no debería llegar aquí
+}
+</script>
+<div style="clear:both;"></div>
+{{cruces}}
+<form id="frm" method="post" action="./registrar/" style="display:inline;">
+ {% csrf_token %}
+ <ul>
+{%for c in circ.candidatos_ordenados%}
+<li><label><input name="cdto_{{c.id}}" value={{c.id}} type="checkbox"
+{% if c.pk in cruces %} checked="checked"
+{% endif %}
+> {{c.nombre}} {{c.apellidos}} <a class="undecorated" onclick="$('#desc_{{c.id}}').toggle(); return false;" href="#NN">+ información</a>
+<table class="oculto" id="desc_{{c.id}}">
+<tbody>
+	<tr>
+	<td class="foto">{% if c.foto %}<img src="{% thumbnail c.foto 100x100 %}">{% endif %}</td>
+	<td class="nombre">
+		<div>Localidad: {{ c.localidad }}</div>
+		<div>Antigüedad en la asociación: {{ c.fecha_alta|date:"Y" }}</div>
+		<div>{{ c.descripcion|linebreaks }}</div>
+		{% if c.presenta %} <div>Presentado por {{ c.presenta }}</div> {% endif %}
+		</td>
+	<td class="cv">{{ c.cv|linebreaks }}</td>
+	<td class="vinculacion">{{ c.vinculacion|linebreaks }}</td>
+	</tr>
+	</tbody>
+</table>
+</label>
+</li>
+{%endfor%}
+<br />
+  <li><label><input name="blanco" id="blanco" value="blanco" type="checkbox"> Voto en blanco </label></li>
+</ul>
+  <input name="submit" value="registrar" type="submit" onclick="return confirmaVoto()">
+  <input type="reset" value="desmarcar todo" ">
+</form>
+<br />
+<br />
+{%endblock%}
+
