@@ -23,7 +23,7 @@ class Socio(models.Model):
     usuario=models.ForeignKey(User, null=True, blank=True)
     corriente=models.BooleanField(verbose_name=u'Al corriente de pago')
     correo_electronico=models.EmailField(null=True, blank=True, verbose_name=u'Dirección de correo electrónico')
-    clave=models.CharField(max_length="50", null=True, blank=True)
+    clave=models.CharField(max_length=50, null=True, blank=True)
     def fecha_voto_legible(self):
         return self.fecha_voto.strftime("%H:%M %d-%m-%Y")
     def fecha_nacimiento_legible(self):

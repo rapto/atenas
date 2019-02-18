@@ -20,7 +20,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '8*a%mj*qvg4e#=yvj=$iqk*jq^*l#ew4m*1+%n)v0(sa1cq54('
+SECRET_KEY = ''
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -82,13 +82,6 @@ WSGI_APPLICATION = 'atenas.wsgi.application'
 
 CACHE_BACKEND = 'memcached://127.0.0.1:11211/'
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
-}
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
@@ -126,9 +119,12 @@ DATABASES = {
 SERVER_EMAIL='elecciones@greenpeace.es'
 
 EMAIL_HOST = '192.168.1.2'
-#EMAIL_HOST_USER = 'elecciones@greenpeace.es'
-#EMAIL_HOST_PASSWORD = 'mail.greenpeace.es'
 
 MAX_CANDIDATOS_25 = 10
 
 LONGITUD_CLAVE = 8
+
+try:
+    from local_settings import *
+except ImportError:
+    pass
