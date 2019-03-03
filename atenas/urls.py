@@ -30,11 +30,11 @@ admin.autodiscover()
 
 urlpatterns = [
 #    url(r'^admin/', include(admin.site.urls)),
-    url("^admin/", include(admin.site.urls)),
+#    url("^adminatenas/", include(admin.site.urls)),
 
     url(r'^atenas/adminatenas/doc/', include('django.contrib.admindocs.urls')),
-#     url(r'^atenas/adminatenas/', include(admin.site.urls)),
-     url(r'^accounts/login/$', django.contrib.auth.views.login),
+    url(r'^atenas/adminatenas/', include(admin.site.urls)),
+    url(r'^accounts/login/$', django.contrib.auth.views.login),
     url(r'^$', comun.views.selector),
 
     url(r'^favicon\.ico$', RedirectView.as_view(url='/static/favicon.ico', permanent=True)),

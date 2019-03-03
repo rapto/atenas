@@ -37,6 +37,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.admindocs',
     'comun',
     'verificacion',
     'recuento',
@@ -116,9 +117,9 @@ DATABASES = {
 }
 
 #EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-SERVER_EMAIL='elecciones@greenpeace.es'
+#SERVER_EMAIL='elecciones@greenpeace.es'
 
-EMAIL_HOST = '192.168.1.2'
+#EMAIL_HOST = '192.168.1.2'
 
 MAX_CANDIDATOS_25 = 10
 
