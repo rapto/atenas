@@ -148,6 +148,7 @@ def registrar_usu_50(request,ca):
 def registrar_usu_25(request,ca):
     return registrar_usu(request, ca, 25, Consejero)
 
+# ya está en la llamada @transaction.atomic
 def registrar_usu(request,ca, tipo, clase_votantes):
     if not is_modulo_activo('votacion_%s' % tipo) and not request.user.is_superuser:
         return HttpResponseRedirect('/')
