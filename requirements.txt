@@ -1,2 +1,7 @@
 django>1.11,<2
-psycopg2-binary
+django-extensions==2.1.6
+docutils==0.14
+easy-thumbnails==2.6
+ipython==5.8.0
+pip-chill==0.1.8
+psycopg2-binary==2.7.7

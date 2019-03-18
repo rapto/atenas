@@ -10,6 +10,8 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.8/ref/settings/
 """
 
+import pytz
+import datetime
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 
@@ -23,10 +25,11 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = ''
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+#DEBUG = True
 
-ALLOWED_HOSTS = []
-
+FECHA_MAXIMA = pytz.timezone('Europe/Madrid').localize(datetime.datetime(1995,9,18))
+STATIC_ROOT = '/home/atenas/atenas/.collectedstatic'
+ALLOWED_HOSTS = ['atenas.example.com']
 
 # Application definition
 
@@ -43,7 +46,7 @@ INSTALLED_APPS = (
     'recuento',
     'django.contrib.humanize',
     'easy_thumbnails',
-
+    'django_extensions',
 )
 
 MIDDLEWARE_CLASSES = (

@@ -6,7 +6,6 @@ import datetime
 from django.conf import settings
 from comun import claveAleatoria
 
-FECHA_MAXIMA = datetime.datetime(1995,9,18)
 
 
 class Socio(models.Model):
@@ -42,7 +41,7 @@ class Socio(models.Model):
     def puedeVotar(self, electronica=False):
         if self.fecha_voto:
             return False,'Registrado voto %s' % (self.fecha_voto_legible(),)
-        if self.fecha_nacimiento and self.fecha_nacimiento>FECHA_MAXIMA:
+        if self.fecha_nacimiento and self.fecha_nacimiento>settings.FECHA_MAXIMA:
             return False, u'La fecha de nacimiento es posterior a %s' % FECHA_MAXIMA.strftime('%m-%d-%Y')
         if not self.corriente:
             return False, u'El socio no está al corriente de pago'

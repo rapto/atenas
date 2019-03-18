@@ -191,8 +191,7 @@ def registrar_usu(request,ca, tipo, clase_votantes):
         candidato=m.Candidato.objects.get(pk=aspa)
         #Sólo en caso de hostilidad
         assert candidato.circunscripcion.pk==circ.pk, u'Se está votando por candidatos de otra papeleta'
-        voto=m.Voto(candidato=candidato)
-        papeleta.voto_set.add(voto)
+        voto=m.Voto(candidato=candidato, papeleta=papeleta)
         voto.save()
     msg = u'<span style="font-size:300%;color:green;">Voto registrado</span>'
     messages.add_message(request, messages.SUCCESS, msg)
