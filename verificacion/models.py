@@ -1,12 +1,29 @@
 # -*- coding: utf-8 -*-
+import datetime
+
 from django.db import models
 from django.contrib.auth.models import User
-from comun.models import Circunscripcion
-import datetime
 from django.conf import settings
+
+from simple_salesforce import Salesforce
+
+from comun.models import Circunscripcion
 from comun import claveAleatoria
 
+params = '''Name Income_ultimos_12_meses_CONSEJO__c
+    DNI__c Birthdate AlizeConstituentID__c MailingPostalCode Email
+    Fecha_de_antiguedad__c Activation_Date__c s360a__ContactCodes__c
+    s360a__ContactType__c'''.split()
 
+
+def getContactByEmail(email):
+    sf = Salesforce(**settings.SF_AUTH)
+    comma_params = ','.join(params)
+    response = sf.query("SELECT "+comma_params+" FROM Contact WHERE Email ='"+email+"' LIMIT 1");
+    objects = response['records']
+    if objects == []:
+        return CustomException("Invalid DNI")
+    return (objects[0])
 
 class Socio(models.Model):
     nombre=models.CharField(max_length=200)
@@ -23,14 +40,17 @@ class Socio(models.Model):
     corriente=models.BooleanField(verbose_name=u'Al corriente de pago')
     correo_electronico=models.EmailField(null=True, blank=True, verbose_name=u'Dirección de correo electrónico')
     clave=models.CharField(max_length=50, null=True, blank=True)
+
     def fecha_voto_legible(self):
         return self.fecha_voto.strftime("%H:%M %d-%m-%Y")
+
     def fecha_nacimiento_legible(self):
         if self.fecha_nacimiento:
             return self.fecha_nacimiento.strftime("%d-%m-%Y")
         return 'n/d'
     def __unicode__(self):
         return u"%s, %s" % (self.apellidos,self.nombre)
+
     class Meta:
         permissions = (
             ("can_verify", "Can verify identities of members"),
@@ -38,6 +58,7 @@ class Socio(models.Model):
             ("can_register_ballot", "Can register a ballot"),
         )
         ordering = ('apellidos','nombre')
+
     def puedeVotar(self, electronica=False):
         if self.fecha_voto:
             return False,'Registrado voto %s' % (self.fecha_voto_legible(),)
@@ -50,7 +71,7 @@ class Socio(models.Model):
                 return False, 'Fecha nacimiento no verificable'
             return True, 'No se dispone de fecha de nacimiento',
         return True, ''
-            
+
     def registraVoto(self, usuario, circunscripcion_voto=None):
         assert self.puedeVotar()[0]
         self.fecha_voto=datetime.datetime.now()
