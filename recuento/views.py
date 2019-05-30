@@ -307,7 +307,8 @@ def presentacion(request, tipo):
             candidato = form.save(commit=False)
             candidato.descripcion = candidato.descripcion or '-'
             candidato.tipo = 0
-            candidato.circunscripcion_id = 18
+            if tipo == 25:
+                candidato.circunscripcion_id = 18
             candidato.valida = None
             candidato.save()
             request.session['id_candidato'] = candidato.id

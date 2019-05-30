@@ -8,11 +8,11 @@
     <title>{%block title%}elecciones{% endblock %}</title>
     <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet">
     <link rel="icon" type="image/vnd.microsoft.icon" href="favicon.ico" />
-    <link rel="stylesheet" type="text/css" href="{% static "screen.css"%}" />
     <link rel="stylesheet" type="text/css" href="{% static "jquery.notifyBar.css" %}" />
   <script src="{% static "jquery-1.9.1.js" %}"></script>
   <script src="{% static "jquery-ui.js" %}"></script>
   <script src="{% static "jquery.notifyBar.js" %}"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
     {%block alt_css%}{% endblock %}
     {%block alt_js%}{% endblock %}
@@ -27,8 +27,8 @@ var msg_html = '{{ message|escapejs }}';
 </script>
 {% endfor %}
 {%block puntitos%}{%endblock%}
-<div id="papel">
-<div> {%block logo%}<img style="float:left" src="{% static "logo.png" %}">{% endblock %}</div>
+<div class="papel">
+{%block logo%}<img style="float:left" src="{% static "logo.png" %}">{% endblock %}
 <h1>{%block title2%}elecciones{% endblock %}</h1>
 {%block body%}
 {% endblock %}

@@ -10,18 +10,18 @@ $(document).ready(inicializaContadores);
 {% endblock %}
 
 {%block body%}
+<p>Para presentar tu candidatura al Consejo de Greenpeace España, por favor, completa el siguiente formulario. </p>
+<p>Para poder presentarte, tienes que ser mayor de edad y socia o socio desde hace, al menos, tres años. Puedes consultar las funciones del Consejo en nuestros <a class = "resaltado" target="_blank" href="https://es.greenpeace.org/es/wp-content/uploads/sites/3/2018/08/Estatutos-Greenpeace-Espa%C3%B1a-2018.pdf">estatutos</a>.</p>
+<p>Para cualquier duda o problema, ponte en contacto con la <a class = "resaltado">Comisión electoral</a> a través de esta dirección de correo: <a class = "resaltado" href="eleccion.es@greenpeace.org">eleccion.es@greenpeace.org</a></p>
+
 <form method="post" id="alta_candidato" enctype="multipart/form-data" 
 onsubmit="return verificarDatos();">
 	{% csrf_token %}
-	<table>
-	
 	    {% for field in form %} 
-	        <tr><td>{{ field.label_tag }}{% if field.field.required %}*{% endif %}</td> 
-	        <td>{{ field.errors }}{{ field }}</td> 	        </tr>
+	        <div class="tr"><div class="td">{{ field.label_tag }}{% if field.field.required %}*{% endif %}</div> 
+	        <div class="td">{{ field.errors }}{{ field }}</div> 	        </div>
 	    {% endfor %} 
 
-	
-	</table>
 	<input type="submit" value="Enviar candidatura" />
 </form>
 

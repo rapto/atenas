@@ -6,6 +6,8 @@ var validations = [
    [ 'cv', 0, 1000 ],
    [ 'descripcion', 1, 150 ],
    [ 'vinculacion', 0, 1000 ],
+   [ 'campanha', 0, 1000 ],
+   [ 'motivacion', 0, 1000 ],
    [ 'dni', 1, 1000 ],
    [ 'correo_e', 1, 254 ],
    [ 'circunscripcion', 1, 1000 ],

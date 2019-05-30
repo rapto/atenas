@@ -8,8 +8,10 @@ class AdminCandidatoForm(ModelForm):
         model = Candidato
         fields = ['nombre', 'apellidos', 'n_socio', 'localidad', 'circunscripcion', 'valida',
                   'cv', 'vinculacion', 'motivacion', 'campanha', 'dni',
-                  'foto', 'correo_e', 'participacion_activa', 'veracidad', 'en_el_consejo', 'asistencia', 'grupos',
-                  'frecuencia_acceso', 'aportacion']
+                  'foto', 'correo_e', 'participacion_activa', 'veracidad', 
+                  #'en_el_consejo', 'asistencia', 'grupos',
+                  #'frecuencia_acceso', 'aportacion'
+                  ]
 
 
 class NuevoCandidatoForm(ModelForm):
@@ -17,12 +19,14 @@ class NuevoCandidatoForm(ModelForm):
         model = Candidato
         fields = ['nombre', 'apellidos', 'localidad', 'circunscripcion',
                   'cv', 'vinculacion', 'motivacion', 'campanha', 'dni',
-                  'foto', 'correo_e', 'participacion_activa', 'veracidad', 'en_el_consejo', 'asistencia', 'grupos',
-                  'frecuencia_acceso', 'aportacion']
-        widgets = {
-                    'asistencia': forms.CheckboxSelectMultiple,
-                    'grupos': forms.CheckboxSelectMultiple,
-                  }
+                  'foto', 'correo_e', 'participacion_activa', 'veracidad',
+                  # 'en_el_consejo', 'asistencia', 'grupos',
+                  #'frecuencia_acceso', 'aportacion'
+                  ]
+        #widgets = {
+        #            'asistencia': forms.CheckboxSelectMultiple,
+        #            'grupos': forms.CheckboxSelectMultiple,
+        #          }
 
     def clean_participacion_activa(self):
         data = self.cleaned_data['participacion_activa']
@@ -111,8 +115,8 @@ class NuevoCandidato25Form(ModelForm):
 class NuevoCandidatoConfirmacionForm(ModelForm):
     class Meta:
         model = Candidato
-        fields = ['nombre', 'apellidos', 'n_socio', 'localidad', 'circunscripcion',
-                  'descripcion', 'cv', 'vinculacion', 'correo_e']
+        fields = ['nombre', 'apellidos', 'localidad', 'circunscripcion',
+                  'cv', 'vinculacion', 'motivacion', 'campanha', 'correo_e']
     
 
 class AlegacionForm(forms.Form):
