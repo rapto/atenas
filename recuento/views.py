@@ -528,13 +528,13 @@ def envia_confirmacion(candidato):
     ret = u'Se ha recibido la siguiente candidatura al Consejo de Greenpeace España:\n'
     for f in form:
         ret += '\n%s: %s' % (f.label, f.value())
-    ret += u'\nSi lo consideras necesario, contacta con la Comisión Electoral en elecciones@greenpeace.es.\nGracias'
+    ret += u'\nSi lo consideras necesario, contacta con la Comisión Electoral en eleccion.es@greenpeace.org.\nGracias'
     destinatarios = [form['correo_e'].value()]
     if candidato.presenta and candidato.presenta.correo_electronico:
         destinatarios.append(candidato.presenta.correo_electronico)
     send_mail(subject=u"Candidatura al Consejo de Greenpeace España",
               message=ret,
-              from_email='elecciones@greenpeace.es',
+              from_email='eleccion.es@greenpeace.org',
               recipient_list=destinatarios,
               )
 
