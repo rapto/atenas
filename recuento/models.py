@@ -83,7 +83,7 @@ class Candidato(models.Model):
     vinculacion=models.TextField(max_length=1000, blank=True, verbose_name=u'Vinculación con Greenpeace -máximo 1.000 caracteres-',
                         validators=[MaxLengthValidator(1000)])
     motivacion=models.TextField(max_length=1000, blank=True, verbose_name=u'Motivación para presentar la candidatura -máximo 1.000 caracteres-',validators=[MaxLengthValidator(1000)])
-    campanha=models.TextField(max_length=150, blank=True, verbose_name=u'¿Qué cambios te gustaría ver en Greenpeace en los próximos tres años? -máximo 1.000 caracteres-',validators=[MaxLengthValidator(1000)])
+    campanha=models.TextField(max_length=1000, blank=True, verbose_name=u'¿Qué cambios te gustaría ver en Greenpeace en los próximos tres años? -máximo 1.000 caracteres-',validators=[MaxLengthValidator(1000)])
     dni = models.FileField(upload_to="%Y/%m/%d", verbose_name=u'Copia del DNI/ Pasaporte/ Tarjeta de residente')
     dni_presenta=models.FileField(upload_to="%Y/%m/%d", verbose_name=u'Miembro del Consejo que presenta al candidato/a: Copia del DNI/ Pasaporte/ Tarjeta de residente', null=True, blank = True)
     foto=models.ImageField(upload_to="%Y/%m/%d", verbose_name=u'Foto -máximo 200kB-', null=True, blank = True)
