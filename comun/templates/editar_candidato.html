@@ -1,14 +1,23 @@
 {% extends "base_verde.html" %}
+{% load static %}
 {%block title2%}
 Elecciones al Consejo de Greenpeace España - Editar candidato
+{% endblock %}
+{%block alt_js%}
+<script type="text/javascript" src="{% static "jquery.simplyCountable.js" %}"></script>
+<script type="text/javascript" src="{% static "atenas.js" %}"></script>
+<script type="text/javascript">
+$(document).ready(inicializaContadores);
+</script>
 {% endblock %}
 
 
 {%block body%}
 <form method="post" enctype="multipart/form-data">
-<table>
-{{ form }}
-</table>
+{% for field in form %}
+<div class="tr"><div class="td">{{ field.label_tag }}{% if field.field.required %}*{% endif %}</div> 
+<div class="td">{{ field.errors }}{{ field }}</div> 	        </div>
+{% endfor %}
 {% csrf_token %}
 <input type="submit" value="guardar datos" />
 </form>

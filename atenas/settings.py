@@ -125,10 +125,7 @@ DATABASES = {
 #EMAIL_HOST = '192.168.1.2'
 
 MAX_CANDIDATOS_25 = 10
-
+MIN_INCOME = 48
 LONGITUD_CLAVE = 8
 
-try:
-    from local_settings import *
-except ImportError:
-    pass
+from local_settings import *

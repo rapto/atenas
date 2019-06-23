@@ -6,11 +6,18 @@ from django import forms
 class AdminCandidatoForm(ModelForm):
     class Meta:
         model = Candidato
-        fields = ['nombre', 'apellidos', 'n_socio', 'localidad', 'circunscripcion', 'valida',
-                  'cv', 'vinculacion', 'motivacion', 'campanha', 'dni',
-                  'foto', 'correo_e', 'participacion_activa', 'veracidad', 
-                  #'en_el_consejo', 'asistencia', 'grupos',
-                  #'frecuencia_acceso', 'aportacion'
+        fields = [
+            'valida', 
+            'valida_sistema',
+            'antiguedad_3a', 'corriente',
+             'mayor_edad', 
+            'circunscripcion_correcta',
+            'nombre', 'apellidos', 'localidad', 'circunscripcion',
+            'fecha_alta',
+            'cv', 'vinculacion', 'motivacion', 'campanha', 'dni',
+            'foto', 'correo_e'
+            #'en_el_consejo', 'asistencia', 'grupos',
+            #'frecuencia_acceso', 'aportacion'
                   ]
 
 
@@ -69,7 +76,7 @@ class NuevoCandidato25Form(ModelForm):
 
     class Meta:
         model = Candidato
-        fields = ['presenta', 'dni_presenta', 'nombre', 'apellidos', 'n_socio', 'localidad',
+        fields = ['presenta', 'dni_presenta', 'nombre', 'apellidos', 'localidad',
                   'descripcion', 'cv', 'vinculacion', 'dni', 'foto', 'correo_e', 'participacion_activa', 'veracidad']
 
     def clean_presenta(self):

@@ -89,6 +89,7 @@ class Candidato(models.Model):
     foto=models.ImageField(upload_to="%Y/%m/%d", verbose_name=u'Foto -máximo 200kB-', null=True, blank = True)
     correo_e=models.EmailField(verbose_name=u'Correo electrónico -para facilitar a la comisión electoral la resolución de errores-')
     participacion_activa=models.BooleanField(verbose_name=u'Compromiso de participación activa: Al presentar esta candidatura adquiero el compromiso, en caso de resultar elegido/a, de participar activamente en las tareas que el Consejo tiene señaladas o se señalen.')
+    corriente = models.NullBooleanField(verbose_name=u'Al corriente de pago')
     veracidad=models.BooleanField(verbose_name=u'Doy fe de la veracidad de los datos')
     mayor_edad=models.NullBooleanField()
     antiguedad_3a=models.NullBooleanField(verbose_name=u'Antigüedad > 3 años')
@@ -99,6 +100,7 @@ class Candidato(models.Model):
                         validators=[MaxLengthValidator(1000)])
     alegaciones=models.TextField(max_length=1000, blank=True,
                         validators=[MaxLengthValidator(1000)])
+    
     #en_el_consejo = models.BooleanField(verbose_name=u'Consejero en la actualidad')
     #asistencia = models.ManyToManyField(Reunion, blank=True, verbose_name=u'Señala las asambleas y encuentros a las que hayas asistido en tu último mandato')
     #grupos = models.ManyToManyField(Grupo, blank=True, verbose_name=u'Indica en qué grupos has participado activamente')

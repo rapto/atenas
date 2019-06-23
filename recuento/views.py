@@ -8,17 +8,19 @@ from django.db import connection, transaction
 from django.db.models.aggregates import Count
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
+from django.utils.dateparse import parse_date
 from recuento import models as m
 from recuento.models import Candidato, Consejero, Papeleta
 from django.conf import settings
 from verificacion import models as mv
+
 import datetime
 from django.contrib import messages
 from recuento.forms import NuevoCandidatoForm, NuevoCandidatoConfirmacionForm,\
     AlegacionForm, NuevoCandidato25Form, AdminCandidatoForm
 from django.forms.widgets import Select
 from comun.views import is_modulo_activo
-from comun.models import Circunscripcion, Plazo
+from comun.models import Circunscripcion, Provincia, Plazo
 
 @permission_required('recuento.can_register_ballot')
 def selector_25(request):
@@ -443,12 +445,43 @@ def editar_candidato(request, tipo, id_candidato):
         return HttpResponseRedirect('/')
     candidato = Candidato.objects.get(pk=id_candidato)
     assert candidato.tipo == tipo
+
     if request.method == 'POST':
         form = AdminCandidatoForm(request.POST, request.FILES, instance=candidato)
         if form.is_valid():
             form.save()
             return HttpResponseRedirect('/comision_%s/' % tipo)
     else:
+        if candidato.valida_sistema:
+            pass
+        else:
+            info = mv.getContact(candidato.correo_e, candidato.dni)
+            if info:
+                if info['Income_ultimos_12_meses_CONSEJO__c'] >= settings.MIN_INCOME:
+                    candidato.corriente = True
+                    candidato.save()
+                if info['Birthdate']:
+                    candidato.fecha_nacimiento = parse_date(info['Birthdate'])
+                    if candidato.fecha_nacimiento <= settings.FECHA_MAXIMA_NACIMIENTO:
+                        candidato.mayor_edad = True
+                    candidato.save()
+                if info['Fecha_de_antiguedad__c']:
+                    candidato.fecha_alta = parse_date(info['Fecha_de_antiguedad__c'])
+                    candidato.antiguedad_3a = candidato.fecha_alta <= settings.FECHA_MAXIMA_ANTIGUEDAD
+                    print '***',candidato.antiguedad_3a
+                    candidato.save()
+                if info['MailingPostalCode']:
+                    prefijo = info['MailingPostalCode'][:2]
+                    circunscripcion_por_cp = Provincia.objects.get(prefijo_cp=prefijo).circunscripcion
+                    candidato.circunscripcion_correcta = candidato.circunscripcion == circunscripcion_por_cp
+                    candidato.save()
+                candidato.valida_sistema = candidato.corriente == True \
+                        and candidato.circunscripcion_correcta == True\
+                        and candidato.mayor_edad == True\
+                        and candidato.antiguedad_3a == True
+                candidato.save()
+        print info
+        print candidato.__dict__
         form=form = AdminCandidatoForm(instance=candidato)
     data = dict(
                 candidato=candidato,

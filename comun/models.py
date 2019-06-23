@@ -1,9 +1,10 @@
+# coding=UTF-8
 from django.db import models
-
 
 class Circunscripcion(models.Model):
     ds=models.CharField(max_length=200)
     alize=models.CharField(max_length=200)
+    cod_ine = models.CharField(max_length=2)
     puestos=models.IntegerField()
     orden=models.IntegerField()
     def __unicode__(self):
@@ -53,6 +54,11 @@ class Circunscripcion(models.Model):
     class Meta:
         ordering = ('orden','ds')
 
+class Provincia(models.Model):
+    ds=models.CharField(max_length=200)
+    prefijo_cp = models.CharField(max_length=2)
+    circunscripcion=models.ForeignKey(Circunscripcion, verbose_name=u"Circunscripción")
+    
 class Plazo(models.Model):
     fecha_inicio = models.DateTimeField()
     fecha_fin = models.DateTimeField()

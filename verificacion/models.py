@@ -16,15 +16,35 @@ params = '''Name Income_ultimos_12_meses_CONSEJO__c
     s360a__ContactType__c'''.split()
 
 
-def getContactByEmail(email):
+def getContact(email, dni):
     sf = Salesforce(**settings.SF_AUTH)
     comma_params = ','.join(params)
-    response = sf.query("SELECT "+comma_params+" FROM Contact WHERE Email ='"+email+"' LIMIT 1");
+    response = sf.query("""
+        SELECT {} 
+        FROM Contact 
+        WHERE Email ='{}' 
+        LIMIT 2 """.format(comma_params, email));
     objects = response['records']
-    if objects == []:
-        return CustomException("Invalid DNI")
-    return (objects[0])
-
+    if len(objects) == 1:
+        return objects[0]
+    response = sf.query("""
+        SELECT {} 
+        FROM Contact 
+        WHERE DNI__c ='{}' 
+        LIMIT 2""".format(comma_params, dni));
+    objects = response['records']
+    if len(objects) == 1:
+        return objects[0]
+    response = sf.query("""
+        SELECT {}
+        FROM Contact 
+        WHERE DNI__c ='{}' 
+        AND  Email ='{}' 
+        LIMIT 2""".format(comma_params, dni, email));
+    objects = response['records']
+    if len(objects) == 1:
+        return objects[0]
+    
 class Socio(models.Model):
     nombre=models.CharField(max_length=200)
     apellidos=models.CharField(max_length=200)
@@ -62,8 +82,8 @@ class Socio(models.Model):
     def puedeVotar(self, electronica=False):
         if self.fecha_voto:
             return False,'Registrado voto %s' % (self.fecha_voto_legible(),)
-        if self.fecha_nacimiento and self.fecha_nacimiento>settings.FECHA_MAXIMA:
-            return False, u'La fecha de nacimiento es posterior a %s' % FECHA_MAXIMA.strftime('%m-%d-%Y')
+        if self.fecha_nacimiento and self.fecha_nacimiento>settings.FECHA_MAXIMA_NACIMIENTO:
+            return False, u'La fecha de nacimiento es posterior a %s' % settings.FECHA_MAXIMA_NACIMIENTO.strftime('%m-%d-%Y')
         if not self.corriente:
             return False, u'El socio no está al corriente de pago'
         if self.fecha_nacimiento==None:
