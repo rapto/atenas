@@ -58,6 +58,8 @@ class Provincia(models.Model):
     ds=models.CharField(max_length=200)
     prefijo_cp = models.CharField(max_length=2)
     circunscripcion=models.ForeignKey(Circunscripcion, verbose_name=u"Circunscripción")
+    def __unicode__(self):
+        return self.ds
     
 class Plazo(models.Model):
     fecha_inicio = models.DateTimeField()

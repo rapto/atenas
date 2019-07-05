@@ -453,9 +453,9 @@ def editar_candidato(request, tipo, id_candidato):
             return HttpResponseRedirect('/comision_%s/' % tipo)
     else:
         if candidato.valida_sistema:
-            pass
+            info = dict(info='Ya validado')
         else:
-            info = mv.getContact(candidato.correo_e, candidato.dni)
+            info = mv.getContact(candidato.correo_e, candidato.num_dni)
             if info:
                 if info['Income_ultimos_12_meses_CONSEJO__c'] >= settings.MIN_INCOME:
                     candidato.corriente = True
@@ -468,7 +468,6 @@ def editar_candidato(request, tipo, id_candidato):
                 if info['Fecha_de_antiguedad__c']:
                     candidato.fecha_alta = parse_date(info['Fecha_de_antiguedad__c'])
                     candidato.antiguedad_3a = candidato.fecha_alta <= settings.FECHA_MAXIMA_ANTIGUEDAD
-                    print '***',candidato.antiguedad_3a
                     candidato.save()
                 if info['MailingPostalCode']:
                     prefijo = info['MailingPostalCode'][:2]
@@ -480,12 +479,13 @@ def editar_candidato(request, tipo, id_candidato):
                         and candidato.mayor_edad == True\
                         and candidato.antiguedad_3a == True
                 candidato.save()
-        print info
-        print candidato.__dict__
+            else:
+                info = dict(info='Sin resultados')
         form=form = AdminCandidatoForm(instance=candidato)
     data = dict(
                 candidato=candidato,
                 form=form,
+                info=info,
                 )
     
     return render(request, 'editar_candidato.html', data)

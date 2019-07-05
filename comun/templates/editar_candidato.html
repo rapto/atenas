@@ -21,4 +21,12 @@ $(document).ready(inicializaContadores);
 {% csrf_token %}
 <input type="submit" value="guardar datos" />
 </form>
+<div>
+<p>Información de BD socios:</p>
+<pre>
+{% for kv in info.items %}
+{{kv}}
+{% endfor %}
+</pre>
+</div>
 {% endblock %}

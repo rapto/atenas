@@ -10,7 +10,6 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.8/ref/settings/
 """
 
-import pytz
 import datetime
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
@@ -27,7 +26,10 @@ SECRET_KEY = ''
 # SECURITY WARNING: don't run with debug turned on in production!
 #DEBUG = True
 
-FECHA_MAXIMA = pytz.timezone('Europe/Madrid').localize(datetime.datetime(1995,9,18))
+MIN_INCOME = 48
+FECHA_CONVOCATORIA = datetime.date(2019,5,31)
+FECHA_MAXIMA_NACIMIENTO = datetime.date(2019 - 18,5,31)
+FECHA_MAXIMA_ANTIGUEDAD = datetime.date(2019 - 3,5,31)
 STATIC_ROOT = '/home/atenas/atenas/.collectedstatic'
 ALLOWED_HOSTS = ['atenas.example.com']
 
