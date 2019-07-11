@@ -451,6 +451,7 @@ def editar_candidato(request, tipo, id_candidato):
         if form.is_valid():
             form.save()
             return HttpResponseRedirect('/comision_%s/' % tipo)
+        info = dict(info='Se han detectado errores')
     else:
         if candidato.valida_sistema:
             info = dict(info='Ya validado')
