@@ -3,7 +3,7 @@
 {%block title2%}Greenpeace España - Elecciones al Consejo{%endblock%}
 {%block body%}
 <h2 style="clear:both;"> Ver las candidaturas</h2>
-<div><a href="/ver_candidatos_{{tipo}}/" target="_blank">Pincha aquí</a> para ver las candidaturas.</div>
+<div><a href="/ver_candidaturas_{{tipo}}/" target="_blank">Pincha aquí</a> para ver las candidaturas.</div>
 <h2 style="clear:both;"> Necesito un código para votar</h2>
 <form method="post" action="/envia_clave_{{tipo}}/">
 {% csrf_token %}

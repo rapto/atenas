@@ -4,28 +4,42 @@
 {%block title2%}
 Elecciones al Consejo de Greenpeace España - Candidaturas
 {% endblock %}
-
+{% block body_id %}ver_candidatos{% endblock %}
 {%block body%}
-<div><a href="javascript:window.close()">[X] Cerrar ventana</a></div>
+<div>
+    <a href="javascript:window.close()">[X] Cerrar ventana</a>
+</div>
+<div>
+    <a target="plazos" href="{% url 'ver_plazos' %}">Consultar plazos del proceso</a>
+</div>
+
 {% for circ, candidatos in ccaa %}
 	{% if circ.pk != 18 %}
 	<h3>{{circ}}</h3>
 	{% endif %}
 <table class="alegaciones">
 <thead>
+    <tr>
+        <th></th>
+        <th>Currículum</th>
+        <th>Vinculación con Greenpeace</th>
+        <th>Motivación</th>
+        <th>¿Cambios en Greenpeace?</th>
+        <th></th>
+    </tr>
 </thead>
 <tbody>
 	{% for candidato in candidatos %}
 	<tr>
-	<td class="foto">{% if candidato.foto %}<img src="{% thumbnail candidato.foto 100x100 %}">{% endif %}</td>
 	<td class="nombre"><div class="nombre">{{ candidato }}</div>
+		{% if candidato.foto %}<img src="{% thumbnail candidato.foto 100x100 %}">{% endif %}
 		<div>Localidad: {{ candidato.localidad }}</div>
 		<div>Antigüedad en la asociación: {{ candidato.fecha_alta|date:"Y" }}</div>
-		<div>{{ candidato.descripcion|linebreaks }}</div>
 		{% if candidato.presenta %} <div>Presentado por {{ candidato.presenta }}</div> {% endif %}
 		</td>
 	<td class="cv">{{ candidato.cv|linebreaks }}</td>
 	<td class="vinculacion">{{ candidato.vinculacion|linebreaks }}</td>
+	<td class="motivacion">{{ candidato.motivacion|linebreaks }}</td>
 	<td class="campanha">{{ candidato.campanha|linebreaks }}</td>
 	    <td class="vinculacion">{% if candidato.en_el_consejo %}
 	        Esta persona pertenece al Consejo en la actualidad y su participación ha sido la siguiente: 

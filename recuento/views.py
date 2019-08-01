@@ -491,14 +491,16 @@ def editar_candidato(request, tipo, id_candidato):
     
     return render(request, 'editar_candidato.html', data)
 
-def ver_candidatos_25(request):
-    return ver_candidatos(request, 25)
+def ver_candidatos_15(request):
+    return ver_candidatos(request, 15)
 
-def ver_candidatos_50(request):
-    return ver_candidatos(request, 50)
+def ver_candidatos_60(request):
+    return ver_candidatos(request, 60)
 
 def ver_candidatos(request, tipo):
-    if not is_modulo_activo('votacion_%s' % tipo) and not request.user.is_superuser:
+    if not is_modulo_activo('votacion_%s' % tipo) and \
+       not is_modulo_activo('ver_candidaturas_%s' % tipo) and \
+        not request.user.is_superuser:
         return HttpResponseRedirect('/')
     candidatos = m.Candidato.objects.filter(tipo=tipo)
     candidatos_valida = candidatos.filter(valida=True).order_by('circunscripcion', 'fecha_alta')

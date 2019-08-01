@@ -14,8 +14,7 @@ Including another URLconf
 """
 from django.conf import settings
 from django.conf.urls import include, url
-from django.views.generic import RedirectView
-
+from django.views.generic import RedirectView, TemplateView
 from django.contrib import admin
 import os
 import django.views
