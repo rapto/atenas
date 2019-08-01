@@ -15,8 +15,9 @@ class AdminCandidatoForm(ModelForm):
             'nombre', 'apellidos', 'localidad', 'circunscripcion',
             'fecha_alta',
             'cv', 'vinculacion', 'motivacion', 'campanha', 'dni', 'num_dni',
-            'foto', 'correo_e'
-            #'en_el_consejo', 'asistencia', 'grupos',
+            'foto', 'correo_e',
+            'en_el_consejo', 'participacion',
+            #'asistencia', 'grupos',
             #'frecuencia_acceso', 'aportacion'
                   ]
 

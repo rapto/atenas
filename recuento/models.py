@@ -102,7 +102,10 @@ class Candidato(models.Model):
     alegaciones=models.TextField(max_length=1000, blank=True,
                         validators=[MaxLengthValidator(1000)])
     
-    #en_el_consejo = models.BooleanField(verbose_name=u'Consejero en la actualidad')
+    en_el_consejo = models.NullBooleanField(verbose_name=u'Actualmente en el Consejo')
+    participacion = models.TextField(max_length=300, blank=True,
+                        validators=[MaxLengthValidator(300)], verbose_name=u'Participación')
+    
     #asistencia = models.ManyToManyField(Reunion, blank=True, verbose_name=u'Señala las asambleas y encuentros a las que hayas asistido en tu último mandato')
     #grupos = models.ManyToManyField(Grupo, blank=True, verbose_name=u'Indica en qué grupos has participado activamente')
     #frecuencia_acceso = models.IntegerField(null=True, blank=True, choices=[

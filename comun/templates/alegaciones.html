@@ -17,15 +17,24 @@ Elecciones al Consejo de Greenpeace España - Plazo de alegaciones
 <tbody>
 	{% for candidato in candidatos %}
 	<tr>
-	<td class="foto">{% if candidato.foto %}<img src="{% thumbnail candidato.foto 100x100 %}">{% endif %}</td>
-	<td class="nombre"><div class="nombre">{{ candidato }}</div>
-		<div>Localidad: {{ candidato.localidad }}</div>
-		<div>Antigüedad en la asociación: {{ candidato.fecha_alta|date:"Y" }}</div>
-		<div>{{ candidato.descripcion|linebreaks }}</div>
-		{% if candidato.presenta %} <div>Presentado por {{ candidato.presenta }}</div> {% endif %}
-		</td>
-	<td class="cv">{{ candidato.cv|linebreaks }}</td>
-	<td class="vinculacion">{{ candidato.vinculacion|linebreaks }}</td>
+	    <td class="foto">{% if candidato.foto %}<img src="{% thumbnail candidato.foto 100x100 %}">{% endif %}</td>
+	    <td class="nombre"><div class="nombre">{{ candidato }}</div>
+		    <div>Localidad: {{ candidato.localidad }}</div>
+		    <div>Antigüedad en la asociación: {{ candidato.fecha_alta|date:"Y" }}</div>
+		    <div>{{ candidato.descripcion|linebreaks }}</div>
+		    {% if candidato.presenta %} <div>Presentado por {{ candidato.presenta }}</div> {% endif %}
+		    </td>
+	    <td class="cv">{{ candidato.cv|linebreaks }}</td>
+	    <td class="vinculacion">{{ candidato.vinculacion|linebreaks }}</td>
+	    <td class="vinculacion">{% if candidato.en_el_consejo %}
+	        Esta persona pertenece al Consejo en la actualidad y su participación ha sido la siguiente: 
+	        {{ candidato.participacion | linebreaks }}
+        {% elif candidato.en_el_consejo == False %}
+	        Esta persona no pertenece al Consejo en la actualidad
+        {% else %}
+	        Información pendiente de cumplimentar
+        {% endif %}
+        </td>
 	</tr>
 	{% endfor %}
 	</tbody>
