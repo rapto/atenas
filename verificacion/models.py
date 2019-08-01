@@ -55,7 +55,7 @@ class Socio(models.Model):
     fecha_socio=models.DateTimeField(null=True,blank=True, verbose_name=u'Fecha antigüedad')
     fecha_voto=models.DateTimeField(null=True,blank=True)
     fecha_nacimiento=models.DateTimeField(null=True,blank=True)
-    circunscripcion_voto=models.ForeignKey(Circunscripcion, null=True,blank=True, related_name='circunscripcion_voto_50')
+    circunscripcion_voto=models.ForeignKey(Circunscripcion, null=True,blank=True, related_name='circunscripcion_voto_60')
     usuario=models.ForeignKey(User, null=True, blank=True)
     corriente=models.BooleanField(verbose_name=u'Al corriente de pago')
     correo_electronico=models.EmailField(null=True, blank=True, verbose_name=u'Dirección de correo electrónico')

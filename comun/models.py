@@ -13,8 +13,8 @@ class Circunscripcion(models.Model):
         return self.papeleta_set.count()
     def cuentaPapeletasVerificadas(self):
         if self.id == 18:
-            return self.circunscripcion_voto_25.count()
-        return self.circunscripcion_voto_50.count()
+            return self.circunscripcion_voto_15.count()
+        return self.circunscripcion_voto_60.count()
     def cuentaVotoBlanco(self):
         return self.papeleta_set.filter(voto_blanco=True).count()
     def cuentaVotoNulo(self):
@@ -35,20 +35,20 @@ class Circunscripcion(models.Model):
         ret = list(self.candidato_set.filter(valida=True, tipo__gt=0))
         ret.sort(key=lambda c:(-c.cuentaVotos(), c.fecha_alta))
         for n, c in enumerate(ret):
-            c.electo = (n < (self.puestos or 25) and c.cuentaVotos())
+            c.electo = (n < (self.puestos or 15) and c.cuentaVotos())
         return ret
             
-    def candidatos_ordenados_50(self):
-        return self.candidatos_ordenados().filter(tipo=50)
+    def candidatos_ordenados_60(self):
+        return self.candidatos_ordenados().filter(tipo=60)
 
-    def cuenta_candidatos_50(self):
-        return self.candidatos_ordenados_50().count()
+    def cuenta_candidatos_60(self):
+        return self.candidatos_ordenados_60().count()
     
-    def candidatos_ordenados_25(self):
-        return self.candidatos_ordenados().filter(tipo=25)
+    def candidatos_ordenados_15(self):
+        return self.candidatos_ordenados().filter(tipo=15)
     
-    def cuenta_candidatos_25(self):
-        return self.candidatos_ordenados_25().count()
+    def cuenta_candidatos_15(self):
+        return self.candidatos_ordenados_15().count()
     
 
     class Meta:

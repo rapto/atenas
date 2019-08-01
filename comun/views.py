@@ -7,12 +7,12 @@ from comun.models import Plazo
 from django.shortcuts import render
 
 @login_required(login_url='/atenas/login/')
-def atenas_25(request):
-    return atenas(request, 25)
+def atenas_15(request):
+    return atenas(request, 15)
 
 @login_required(login_url='/atenas/login/')
-def atenas_50(request):
-    return atenas(request, 50)
+def atenas_60(request):
+    return atenas(request, 60)
 
 def atenas(request, tipo):
     return render(request, 'index.html', dict(tipo=tipo))

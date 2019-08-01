@@ -14,7 +14,7 @@ class Consejero(models.Model):
     apellidos=models.CharField(max_length=200)
     activo = models.BooleanField()
     usuario=models.ForeignKey(User, null=True, blank=True)
-    circunscripcion_voto=models.ForeignKey(Circunscripcion, null=True,blank=True, related_name='circunscripcion_voto_25')
+    circunscripcion_voto=models.ForeignKey(Circunscripcion, null=True,blank=True, related_name='circunscripcion_voto_15')
     fecha_voto=models.DateTimeField(null=True,blank=True)
     correo_electronico=models.EmailField(null=True, blank=True)
     clave=models.CharField(max_length=50, null=True, blank=True)

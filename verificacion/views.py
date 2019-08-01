@@ -10,12 +10,12 @@ from recuento.models import Consejero
 from django.shortcuts import render
 
 @permission_required('verificacion.verify')
-def registrar_50(request, id_socio):
-    return registrar(request, id_socio, 50, Socio)
+def registrar_60(request, id_socio):
+    return registrar(request, id_socio, 60, Socio)
 
 @permission_required('verificacion.verify')
-def registrar_25(request, id_socio):
-    return registrar(request, id_socio, 25, Consejero)
+def registrar_15(request, id_socio):
+    return registrar(request, id_socio, 15, Consejero)
 
 def registrar(request, id_socio, tipo, clase_votante):
     circunscripciones=Circunscripcion.objects.all()
@@ -23,12 +23,12 @@ def registrar(request, id_socio, tipo, clase_votante):
     return render(request, 'registrar.html', locals())
 
 @permission_required('verificacion.can_mark_voted')
-def registrarKO_25(request, id_socio):
-    return registrarKO(request, id_socio, 25, Consejero)
+def registrarKO_15(request, id_socio):
+    return registrarKO(request, id_socio, 15, Consejero)
 
 @permission_required('verificacion.can_mark_voted')
-def registrarKO_50(request, id_socio):
-    return registrarKO(request, id_socio, 50, Socio)
+def registrarKO_60(request, id_socio):
+    return registrarKO(request, id_socio, 60, Socio)
 
 def registrarKO(request, id_socio, tipo, clase_votante):
     assert request.method=='POST'
@@ -39,12 +39,12 @@ def registrarKO(request, id_socio, tipo, clase_votante):
     return HttpResponseRedirect('../../')
 
 @permission_required('verificacion.can_mark_voted')
-def registrarOK_25(request, id_socio):
-    return registrarOK(request, id_socio, 25, Consejero)
+def registrarOK_15(request, id_socio):
+    return registrarOK(request, id_socio, 15, Consejero)
 
 @permission_required('verificacion.can_mark_voted')
-def registrarOK_50(request, id_socio):
-    return registrarOK(request, id_socio, 50, Socio)
+def registrarOK_60(request, id_socio):
+    return registrarOK(request, id_socio, 60, Socio)
 
 def registrarOK(request, id_socio, tipo, clase_votante):
     assert request.method=='POST'
@@ -59,12 +59,12 @@ def registrarOK(request, id_socio, tipo, clase_votante):
     
 
 @permission_required('verificacion.can_verify')
-def index_25(request):
-    return index(request, 25, Consejero)
+def index_15(request):
+    return index(request, 15, Consejero)
 
 @permission_required('verificacion.can_verify')
-def index_50(request):
-    return index(request, 50, Socio)
+def index_60(request):
+    return index(request, 60, Socio)
 
 def index(request, tipo, clase_votante):
     try:
@@ -106,7 +106,7 @@ def index(request, tipo, clase_votante):
     else:
         res=[]
     res=res[:100]
-    if tipo == 25:
+    if tipo == 15:
         circunscripciones=Circunscripcion.objects.filter(pk=18)
     else:
         circunscripciones=Circunscripcion.objects.all()

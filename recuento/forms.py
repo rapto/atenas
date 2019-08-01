@@ -68,9 +68,9 @@ class NuevoCandidatoForm(ModelForm):
         return data.replace('\r\n', '\r')
                 
 
-class NuevoCandidato25Form(ModelForm):
+class NuevoCandidato15Form(ModelForm):
     def __init__(self, *args, **kwargs):
-        super(NuevoCandidato25Form, self).__init__(*args, **kwargs)
+        super(NuevoCandidato15Form, self).__init__(*args, **kwargs)
     
         del self.fields['descripcion']
         self.fields['dni_presenta'].required = True
@@ -84,7 +84,7 @@ class NuevoCandidato25Form(ModelForm):
         data = self.cleaned_data['presenta']
         if not data:
             raise forms.ValidationError(u"Se debe indicar qué consejero/a presenta al nuevo candidato/a")
-        if data.candidato_set.filter(tipo=25).count() >= 2:
+        if data.candidato_set.filter(tipo=15).count() >= 2:
             raise forms.ValidationError(u"Este consejero/a ya ha presentado a dos candidatos/as")
         return data
         

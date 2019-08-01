@@ -17,22 +17,22 @@ from verificacion import models as mv
 import datetime
 from django.contrib import messages
 from recuento.forms import NuevoCandidatoForm, NuevoCandidatoConfirmacionForm,\
-    AlegacionForm, NuevoCandidato25Form, AdminCandidatoForm
+    AlegacionForm, NuevoCandidato15Form, AdminCandidatoForm
 from django.forms.widgets import Select
 from comun.views import is_modulo_activo
 from comun.models import Circunscripcion, Provincia, Plazo
 
 @permission_required('recuento.can_register_ballot')
-def selector_25(request):
-    return selector(request, 25)
+def selector_15(request):
+    return selector(request, 15)
 
 @permission_required('recuento.can_register_ballot')
-def selector_50(request):
-    return selector(request, 50)
+def selector_60(request):
+    return selector(request, 60)
 
 def selector(request, tipo):
     circ_singular = Circunscripcion.objects.get(pk=18)
-    if tipo == 25:
+    if tipo == 15:
         papeletas = Papeleta.objects.filter(circunscripcion__id=18
                                             ).order_by('-fecha_registro')[:5]
         ccaa = Circunscripcion.objects.filter(id=18)
@@ -44,11 +44,11 @@ def selector(request, tipo):
                        papeletas=papeletas,
                        tipo=tipo))
 
-def votacion_25(request):
-    return votacion(request, 25, Consejero)
+def votacion_15(request):
+    return votacion(request, 15, Consejero)
 
-def votacion_50(request):
-    return votacion(request, 50, mv.Socio)
+def votacion_60(request):
+    return votacion(request, 60, mv.Socio)
 
 def votacion(request, tipo, clase_votantes):
     if not is_modulo_activo('votacion_%s' % tipo) and not request.user.is_superuser:
@@ -67,9 +67,9 @@ def votacion(request, tipo, clase_votantes):
         messages.add_message(request, messages.WARNING, u'No puede votar: %s' % msg)
         return HttpResponseRedirect('/')
     request.session['usu%s' % tipo]=socio.pk
-    if tipo == 25:
+    if tipo == 15:
         return HttpResponseRedirect('/papeleta_%s/%s/' % (tipo, 18))
-    if tipo == 50 and socio.circunscripcion.pk!=18:
+    if tipo == 60 and socio.circunscripcion.pk!=18:
         return HttpResponseRedirect('/papeleta_%s/%s/' % (tipo, socio.circunscripcion.pk))
     else:
         return render(request, 'selector_usu.html',
@@ -83,11 +83,11 @@ def ultimaPapeleta(user,circ):
         ultimo=None
     return ultimo
 
-def papeleta_usu_50(request, ca):
-    return papeleta_usu(request, ca, 50, mv.Socio)
+def papeleta_usu_60(request, ca):
+    return papeleta_usu(request, ca, 60, mv.Socio)
 
-def papeleta_usu_25(request, ca):
-    return papeleta_usu(request, ca, 25, Consejero)
+def papeleta_usu_15(request, ca):
+    return papeleta_usu(request, ca, 15, Consejero)
 
 def papeleta_usu(request, ca, tipo, clase_votantes):
     if not is_modulo_activo('votacion_%s' % tipo) and not request.user.is_superuser:
@@ -103,19 +103,19 @@ def papeleta_usu(request, ca, tipo, clase_votantes):
         return render(request, 'mensaje_pub.html')
     circ=m.Circunscripcion.objects.get(pk=ca)
     plantilla = 'papeleta_pub.html'
-    if tipo == 50:
+    if tipo == 60:
         max_candidatos = circ.puestos
         assert socio.circunscripcion.pk == 18 or socio.circunscripcion == circ
     else:
-        max_candidatos = settings.MAX_CANDIDATOS_25
+        max_candidatos = settings.MAX_CANDIDATOS_15
     return render(request, plantilla, locals())
 
-def papeleta_admin_25(request, ca):
-    return papeleta_admin(request, ca, 25, settings.MAX_CANDIDATOS_25)
+def papeleta_admin_15(request, ca):
+    return papeleta_admin(request, ca, 15, settings.MAX_CANDIDATOS_15)
 
-def papeleta_admin_50(request, ca):
+def papeleta_admin_60(request, ca):
     circ=m.Circunscripcion.objects.get(pk=ca)
-    return papeleta_admin(request, ca, 50, circ.puestos)
+    return papeleta_admin(request, ca, 60, circ.puestos)
 
 def papeleta_admin(request, ca, tipo, puestos):
     if not request.user.is_authenticated():
@@ -126,12 +126,12 @@ def papeleta_admin(request, ca, tipo, puestos):
 
 @transaction.atomic    
 @permission_required('recuento.can_register_ballot')
-def anular_25(request,ca):
-    return anular(request, ca, 25)
+def anular_15(request,ca):
+    return anular(request, ca, 15)
 @transaction.atomic    
 @permission_required('recuento.can_register_ballot')
-def anular_50(request,ca):
-    return anular(request, ca, 50)
+def anular_60(request,ca):
+    return anular(request, ca, 60)
 
 def anular(request,ca, tipo):
     circ=m.Circunscripcion.objects.get(pk=ca)
@@ -143,12 +143,12 @@ def anular(request,ca, tipo):
     return HttpResponseRedirect('/atenas_%s/papeleta/%s/' % (tipo, ca))
 
 @transaction.atomic
-def registrar_usu_50(request,ca):
-    return registrar_usu(request, ca, 50, mv.Socio)
+def registrar_usu_60(request,ca):
+    return registrar_usu(request, ca, 60, mv.Socio)
 
 @transaction.atomic
-def registrar_usu_25(request,ca):
-    return registrar_usu(request, ca, 25, Consejero)
+def registrar_usu_15(request,ca):
+    return registrar_usu(request, ca, 15, Consejero)
 
 # ya está en la llamada @transaction.atomic
 def registrar_usu(request,ca, tipo, clase_votantes):
@@ -161,7 +161,7 @@ def registrar_usu(request,ca, tipo, clase_votantes):
         return HttpResponseRedirect("/")
     circ=m.Circunscripcion.objects.get(pk=ca)
     usu= clase_votantes.objects.get(pk=id_usu)
-    if tipo == 50:
+    if tipo == 60:
         assert usu.circunscripcion_id==18 or circ.pk==usu.circunscripcion_id, 'Se está votando por una circ no autorizada'
     puedeVotar, msg = usu.puedeVotar(True)
     if not puedeVotar:
@@ -172,10 +172,10 @@ def registrar_usu(request,ca, tipo, clase_votantes):
     papeleta=m.Papeleta(circunscripcion=circ,
         usuario_registro=request.user.is_authenticated() and request.user or None)
     aspas=[int(v) for k,v in request.POST.items() if k.startswith('cdto')]
-    if tipo == 50:
+    if tipo == 60:
         max_candidatos = circ.puestos
     else:
-        max_candidatos = settings.MAX_CANDIDATOS_25
+        max_candidatos = settings.MAX_CANDIDATOS_15
     assert len(aspas)<=max_candidatos, u'No se puede votar a más candidatos que puestos'
     if request.POST.get('nulo'):
         assert not aspas, u'Aspas y nulo'
@@ -201,12 +201,12 @@ def registrar_usu(request,ca, tipo, clase_votantes):
     return HttpResponseRedirect('/')
 
 @transaction.atomic
-def registrar_admin_50(request, ca):
-    return registrar_admin(request, ca, 50)
+def registrar_admin_60(request, ca):
+    return registrar_admin(request, ca, 60)
 
 @transaction.atomic
-def registrar_admin_25(request, ca):
-    return registrar_admin(request, ca, 25)
+def registrar_admin_15(request, ca):
+    return registrar_admin(request, ca, 15)
 
 def registrar_admin(request, ca, tipo):
     if not is_modulo_activo('recuento_%s' % tipo) and not request.user.is_superuser:
@@ -220,10 +220,10 @@ def registrar_admin(request, ca, tipo):
     papeleta=m.Papeleta(circunscripcion=circ,
         usuario_registro=request.user.is_authenticated() and request.user or None)
     aspas=[int(v) for k,v in request.POST.items() if k.startswith('cdto')]
-    if tipo == 50:
+    if tipo == 60:
         assert len(aspas) <= circ.puestos, u'No se puede votar a más candidatos que puestos'
     else:
-        assert len(aspas) <= settings.MAX_CANDIDATOS_25
+        assert len(aspas) <= settings.MAX_CANDIDATOS_15
     if request.POST.get('nulo'):
         assert not aspas, u'Aspas y nulo'
         papeleta.voto_nulo=True
@@ -253,13 +253,13 @@ def registrar_admin(request, ca, tipo):
 
 @transaction.atomic
 @ratelimit_post(minutes = 3, requests = 10)
-def envia_clave_50(request):
-    return envia_clave(request, 50, mv.Socio)
+def envia_clave_60(request):
+    return envia_clave(request, 60, mv.Socio)
 
 @transaction.atomic
 @ratelimit_post(minutes = 3, requests = 10)
-def envia_clave_25(request):
-    return envia_clave(request, 25, Consejero)
+def envia_clave_15(request):
+    return envia_clave(request, 15, Consejero)
 
 def envia_clave(request, tipo, clase_votantes):
     
@@ -291,25 +291,25 @@ def envia_clave(request, tipo, clase_votantes):
     return HttpResponseRedirect('/votacion_%s/' % tipo)
 
 @ratelimit_post(minutes = 3, requests = 10)
-def presentacion_50(request):
-    return presentacion(request, 50)
+def presentacion_60(request):
+    return presentacion(request, 60)
 
 @ratelimit_post(minutes = 3, requests = 10)
-def presentacion_25(request):
-    return presentacion(request, 25)
+def presentacion_15(request):
+    return presentacion(request, 15)
 
 def presentacion(request, tipo):
     if not is_modulo_activo('presentacion_%s' % tipo) and not request.user.is_superuser:
         return HttpResponseRedirect('/')
     plantilla = 'presentacion.html'
-    form_class = NuevoCandidatoForm if tipo==50 else NuevoCandidato25Form
+    form_class = NuevoCandidatoForm if tipo==60 else NuevoCandidato15Form
     if request.method == 'POST': # If the form has been submitted...
         form = form_class(request.POST, request.FILES) # A form bound to the POST data
         if form.is_valid():
             candidato = form.save(commit=False)
             candidato.descripcion = candidato.descripcion or '-'
             candidato.tipo = 0
-            if tipo == 25:
+            if tipo == 15:
                 candidato.circunscripcion_id = 18
             candidato.valida = None
             candidato.save()
@@ -321,12 +321,12 @@ def presentacion(request, tipo):
     return render(request, plantilla, dict(form=form))
 
 @ratelimit_post(minutes = 3, requests = 10)
-def confirmar_50(request):
-    return confirmar(request, 50)
+def confirmar_60(request):
+    return confirmar(request, 60)
 
 @ratelimit_post(minutes = 3, requests = 10)
-def confirmar_25(request):
-    return confirmar(request, 25)
+def confirmar_15(request):
+    return confirmar(request, 15)
 
 def confirmar(request, tipo):
     if not is_modulo_activo('presentacion_%s' % tipo) and not request.user.is_superuser:
@@ -360,7 +360,7 @@ def confirmar(request, tipo):
         if not socio.corriente:
             candidato.comentarios += '\nNo corriente'
             candidato.valida_sistema = False
-        if tipo == 25:
+        if tipo == 15:
             fecha_alta_tope = datetime.datetime(2013 - 3, 4, 21)
         else:
             fecha_alta_tope = datetime.datetime(2013 - 3, 10, 20)
@@ -378,7 +378,7 @@ def confirmar(request, tipo):
         return HttpResponseRedirect('/ok2_%s/' % tipo)
     else:
         form = NuevoCandidatoConfirmacionForm(instance=candidato)
-        if tipo == 25:
+        if tipo == 15:
             del form.fields['descripcion']
             del form.fields['circunscripcion']
         c = dict(form=form, candidato=candidato)
@@ -391,11 +391,11 @@ def confirmar(request, tipo):
             
         return render(request, 'presentacion_previa.html', c)
 
-def alegaciones_50(request):
-    return alegaciones(request, 50)
+def alegaciones_60(request):
+    return alegaciones(request, 60)
 
-def alegaciones_25(request):
-    return alegaciones(request, 25)
+def alegaciones_15(request):
+    return alegaciones(request, 15)
 
 def alegaciones(request, tipo):
     if not is_modulo_activo('alegaciones_%s' % tipo) and not request.user.is_superuser:
@@ -409,12 +409,12 @@ def alegaciones(request, tipo):
     return render(request, 'alegaciones.html', c)
 
 @permission_required('recuento.change_candidato')
-def comision_50(request):
-    return comision(request, 50)
+def comision_60(request):
+    return comision(request, 60)
 
 @permission_required('recuento.change_candidato')
-def comision_25(request):
-    return comision(request, 25)
+def comision_15(request):
+    return comision(request, 15)
 
 def comision(request, tipo):
     if (not is_modulo_activo('comision_%s' % tipo) 
@@ -431,13 +431,13 @@ def comision(request, tipo):
 
 @ratelimit_post(minutes = 3, requests = 10)
 @permission_required('recuento.change_candidato')
-def editar_candidato_50(request, num):
-    return editar_candidato(request, 50, num)
+def editar_candidato_60(request, num):
+    return editar_candidato(request, 60, num)
 
 @ratelimit_post(minutes = 3, requests = 10)
 @permission_required('recuento.change_candidato')
-def editar_candidato_25(request, num):
-    return editar_candidato(request, 25, num)
+def editar_candidato_15(request, num):
+    return editar_candidato(request, 15, num)
 
 def editar_candidato(request, tipo, id_candidato):
     if (not is_modulo_activo('comision_%s' % tipo) 
@@ -507,13 +507,13 @@ def ver_candidatos(request, tipo):
     c = dict(ccaa=ccaa)
     return render(request, 'ver_candidatos.html', c)
 
-def resultado_25(request):
+def resultado_15(request):
     ccaa = Circunscripcion.objects.filter(pk=18)
-    return resultado(request, 25, ccaa)
+    return resultado(request, 15, ccaa)
 
-def resultado_50(request):
+def resultado_60(request):
     ccaa = Circunscripcion.objects.exclude(pk=18)
-    return resultado(request, 50, ccaa)
+    return resultado(request, 60, ccaa)
 
 def resultado(request, tipo, ccaa):
     modulo = is_modulo_activo('resultado_%s' % tipo)
@@ -524,17 +524,17 @@ def resultado(request, tipo, ccaa):
     c = dict(ccaa=ccaa, modulo=modulo[0])
     return render(request, 'resultados.html', c)
 
-def ok_25(request):
-    return render(request, 'ok_25.html')
+def ok_15(request):
+    return render(request, 'ok_15.html')
 
-def ok_50(request):
-    return render(request, 'ok_50.html')
+def ok_60(request):
+    return render(request, 'ok_60.html')
 
 def alegacion_ok(request):
     return render(request, 'alegacion_ok.html')
 
 def alegar(request, num):
-    if not is_modulo_activo('alegaciones_50') and not is_modulo_activo('alegaciones_25') and not request.user.is_superuser:
+    if not is_modulo_activo('alegaciones_60') and not is_modulo_activo('alegaciones_15') and not request.user.is_superuser:
         return HttpResponseRedirect('/')
     candidato = m.Candidato.objects.get(pk=num)
     if request.method == 'POST':
@@ -551,11 +551,11 @@ def alegar(request, num):
                 )
     return render(request, 'formulario_alegacion.html', data)
 
-def casi_ok_25(request):
-    return render(request, 'casi_ok_25.html')
+def casi_ok_15(request):
+    return render(request, 'casi_ok_15.html')
 
-def casi_ok_50(request):
-    return render(request, 'casi_ok_50.html')
+def casi_ok_60(request):
+    return render(request, 'casi_ok_60.html')
 
 def envia_confirmacion(candidato):
     form = NuevoCandidatoConfirmacionForm(instance=candidato)
