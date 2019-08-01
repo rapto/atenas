@@ -112,6 +112,9 @@ td.vinculacion{
     font-weight: bold;
 }
 
+table.plazos {
+    text-align: center;
+}
 table.resultados{
     border: 1px solid;
     font-size: large;
