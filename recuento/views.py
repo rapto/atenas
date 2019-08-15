@@ -4,6 +4,7 @@ from itertools import groupby
 from comun.ratelimitcache import ratelimit_post
 from django.contrib.auth.decorators import permission_required
 from django.core.mail import send_mail
+from django.core.validators import EmailValidator, ValidationError
 from django.db import connection, transaction
 from django.db.models.aggregates import Count
 from django.http import HttpResponse, HttpResponseRedirect
@@ -21,6 +22,10 @@ from recuento.forms import NuevoCandidatoForm, NuevoCandidatoConfirmacionForm,\
 from django.forms.widgets import Select
 from comun.views import is_modulo_activo
 from comun.models import Circunscripcion, Provincia, Plazo
+
+
+def diff_month(d1, d2):
+    return (d1.year - d2.year) * 12 + d1.month - d2.month
 
 @permission_required('recuento.can_register_ballot')
 def selector_15(request):
@@ -262,8 +267,6 @@ def envia_clave_15(request):
     return envia_clave(request, 15, Consejero)
 
 def envia_clave(request, tipo, clase_votantes):
-    
-    MSG_DIRECCION_KO = u'Disculpa, pero esa dirección no está registrada como votante. Por favor, vota por correo postal.'
     if not is_modulo_activo('votacion_%s' % tipo) and not request.user.is_superuser:
         return HttpResponseRedirect('/')
     if request.method!="POST":
@@ -271,22 +274,63 @@ def envia_clave(request, tipo, clase_votantes):
     email = request.POST.get('email')
     if not email:
         return HttpResponseRedirect('/votacion_%s/' % tipo)
-    socios = clase_votantes.objects.filter(correo_electronico=email)
-    level = messages.WARNING
-    if not socios:
-        msg = MSG_DIRECCION_KO
-    elif len(socios) > 1:
-        msg = u'Disculpa, pero esa dirección corresponde a más de una persona. Por favor, vota por correo postal.'
-    else:
-        socio = socios[0]
-        if socio.clave or socio.puedeVotar(True)[0]:
-            email_text = u'Estimado/a %s %s\r\nÉsta es tu clave: %s\r\nPuedes votar en https://elecciones.greenpeace.es' % (socio.nombre, socio.apellidos, socio.get_clave())
-            send_mail(u"[Greenpeace España/Elecciones] Clave para votar ", email_text, 'no-reply@greenpeace.es', [socio.correo_electronico], 
-                  fail_silently= False)
-            msg = u'Por favor, verifica tu buzón de correo. En breve te llegará un mensaje con la clave para votar.'
-            level = messages.SUCCESS
+    info = mv.getContact(email, email)
+    msg = ''
+    if info:
+        num_socio = info[u'AlizeConstituentID__c']
+        income = info['Income_ultimos_12_meses_CONSEJO__c']
+        fecha_alta = parse_date(info['Activation_Date__c'])
+        today = datetime.date.today()
+        meses_active = min(12, diff_month(today, fecha_alta)) 
+        if income / meses_active < settings.MIN_INCOME / 12:
+            msg = u'''Parece que hay algún problema con el pago de tu cuota,
+            por favor, ponte en contacto con nuestra oficina, teléfono: 900 535 025,
+            correo electrónico:
+            <a href="mailto:sociasysocios.es@greenpeace.org">sociasysocios.es@greenpeace.org</a>.
+            Cuando esté resuelto, inténtalo de nuevo. Te esperamos.'''
+        if info['Birthdate']:
+            fecha_nacimiento = parse_date(info['Birthdate'])
+            if fecha_nacimiento > settings.FECHA_MAXIMA_NACIMIENTO:
+                msg = u'''Para poder participar en estas elecciones necesitabas ser mayor de edad
+                en el momento de la convocatoria. Te esperamos en las próximas elecciones'''
         else:
-            msg = MSG_DIRECCION_KO
+            msg = u'''Para poder votar necesitas tener fecha de nacimiento en la base de 
+            datos. Por favor, ponte en contacto con nuestra oficina, teléfono: 900 535 025, 
+            correo electrónico: sociasysocios.es@greenpeace.org o actualízala en
+             Tu perfil greenpeace. Cuando esté resuelto, inténtalo de nuevo. Te esperamos.'''
+        try:
+            EmailValidator()(info['Email'])
+        except ValidationError:
+            msg = u'''Para poder votar electrónicamente, necesitamos que tengas una dirección de correo electrónico registrada en la base de datos de Greenpeace España para enviarte la clave. Por favor, ponte en contacto con nuestra oficina, teléfono: 900 535 025, correo electrónico: sociasysocios.es@greenpeace.org. Cuando esté resuelto, inténtalo de nuevo. Te esperamos.'''
+        if fecha_alta > settings.FECHA_CONVOCATORIA:
+            msg = u'''Para poder participar en estas elecciones necesitabas pertenecer a Greenpeace España en el momento de su convocatoria. Te esperamos en las próximas elecciones.'''
+        soc_local = mv.Socio.objects.filter(num_socio=num_socio).exclude(fecha_voto=None).first()
+        if soc_local:
+            msg = u'''El sistema tiene registrado tu voto en {:%d-%m-%Y %H:%M}'''.format(soc_local.fecha_voto)
+    else:
+        msg = u'''No hay ninguna persona en nuestra base de datos que cumpla esta condición.
+        Por favor, ponte en contacto con nuestra oficina, teléfono: 900 535 025,
+        correo electrónico: <a href="mailto:sociasysocios.es@greenpeace.org">sociasysocios.es@greenpeace.org</a>.
+        Cuando esté resuelto, inténtalo de nuevo. Te esperamos.'''
+    
+    if msg == '':
+        socio, created = mv.Socio.objects.get_or_create(num_socio=num_socio)
+        socio.correo_electronico = info['Email']
+        socio.nombre = info['Name']
+        if info['MailingPostalCode']:
+            prefijo = info['MailingPostalCode'][:2]
+            circunscripcion_por_cp = Provincia.objects.get(prefijo_cp=prefijo).circunscripcion
+        else:
+            circunscripcion_por_cp = Provincia.objects.get(id=18)
+        socio.circunscripcion = circunscripcion_por_cp
+        socio.save()
+        email_text = u'Estimado/a %s\r\nÉsta es tu clave: %s\r\nPuedes votar en https://elecciones.greenpeace.es' % (socio.nombre, socio.get_clave())
+        send_mail(u"[Greenpeace España/Elecciones] Clave para votar ", email_text, 'no-reply@greenpeace.es', [socio.correo_electronico], 
+              fail_silently= False)
+        msg = u'Por favor, verifica tu buzón de correo. En breve te llegará un mensaje con la clave para votar.'
+        level = messages.SUCCESS
+    else:
+        level = messages.WARNING
     messages.add_message(request, level, msg)
     return HttpResponseRedirect('/votacion_%s/' % tipo)
 

@@ -46,8 +46,8 @@ def getContact(email, dni):
         return objects[0]
     
 class Socio(models.Model):
-    nombre=models.CharField(max_length=200)
-    apellidos=models.CharField(max_length=200)
+    nombre=models.CharField(max_length=200, null=True,blank=True)
+    apellidos=models.CharField(max_length=200, null=True,blank=True)
     docu_id=models.CharField(max_length=200,blank=True, verbose_name=u'Documento de identidad')
     num_socio=models.CharField(max_length=200, verbose_name=u'Número de socio/a')
     num_socio_antiguo=models.CharField(max_length=200,blank=True, null=True, verbose_name=u'Número de socio/a antiguo')
@@ -57,7 +57,6 @@ class Socio(models.Model):
     fecha_nacimiento=models.DateTimeField(null=True,blank=True)
     circunscripcion_voto=models.ForeignKey(Circunscripcion, null=True,blank=True, related_name='circunscripcion_voto_60')
     usuario=models.ForeignKey(User, null=True, blank=True)
-    corriente=models.BooleanField(verbose_name=u'Al corriente de pago')
     correo_electronico=models.EmailField(null=True, blank=True, verbose_name=u'Dirección de correo electrónico')
     clave=models.CharField(max_length=50, null=True, blank=True)
 
@@ -69,7 +68,7 @@ class Socio(models.Model):
             return self.fecha_nacimiento.strftime("%d-%m-%Y")
         return 'n/d'
     def __unicode__(self):
-        return u"%s, %s" % (self.apellidos,self.nombre)
+        return u"%s, %s" % (self.apellidos or '',self.nombre or '')
 
     class Meta:
         permissions = (
@@ -82,14 +81,6 @@ class Socio(models.Model):
     def puedeVotar(self, electronica=False):
         if self.fecha_voto:
             return False,'Registrado voto %s' % (self.fecha_voto_legible(),)
-        if self.fecha_nacimiento and self.fecha_nacimiento>settings.FECHA_MAXIMA_NACIMIENTO:
-            return False, u'La fecha de nacimiento es posterior a %s' % settings.FECHA_MAXIMA_NACIMIENTO.strftime('%m-%d-%Y')
-        if not self.corriente:
-            return False, u'El socio no está al corriente de pago'
-        if self.fecha_nacimiento==None:
-            if electronica:
-                return False, 'Fecha nacimiento no verificable'
-            return True, 'No se dispone de fecha de nacimiento',
         return True, ''
 
     def registraVoto(self, usuario, circunscripcion_voto=None):
