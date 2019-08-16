@@ -25,7 +25,8 @@ def getContact(email, dni):
     response = sf.query("""
         SELECT {} 
         FROM Contact 
-        WHERE Email ='{}' 
+        WHERE Email ='{}'
+        AND s360a__ContactCodes__c = 'Active Donor'
         LIMIT 2 """.format(comma_params, email));
     objects = response['records']
     if len(objects) == 1:
@@ -35,7 +36,8 @@ def getContact(email, dni):
     response = sf.query("""
         SELECT {} 
         FROM Contact 
-        WHERE DNI__c ='{}' 
+        WHERE DNI__c ='{}'
+        AND s360a__ContactCodes__c = 'Active Donor'
         LIMIT 2""".format(comma_params, dni));
     objects = response['records']
     if len(objects) == 1:
@@ -45,7 +47,8 @@ def getContact(email, dni):
     response = sf.query("""
         SELECT {}
         FROM Contact 
-        WHERE DNI__c ='{}' 
+        WHERE DNI__c ='{}'
+        AND s360a__ContactCodes__c = 'Active Donor'
         AND  Email ='{}' 
         LIMIT 2""".format(comma_params, dni, email));
     objects = response['records']
