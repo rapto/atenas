@@ -15,8 +15,11 @@ params = '''Name Income_ultimos_12_meses_CONSEJO__c
     Fecha_de_antiguedad__c Activation_Date__c s360a__ContactCodes__c
     s360a__ContactType__c'''.split()
 
+class MultipleContactsError(RuntimeError):
+    pass
 
 def getContact(email, dni):
+    multiple = False
     sf = Salesforce(**settings.SF_AUTH)
     comma_params = ','.join(params)
     response = sf.query("""
@@ -27,6 +30,8 @@ def getContact(email, dni):
     objects = response['records']
     if len(objects) == 1:
         return objects[0]
+    elif len(objects) > 1:
+        multiple = True
     response = sf.query("""
         SELECT {} 
         FROM Contact 
@@ -35,6 +40,8 @@ def getContact(email, dni):
     objects = response['records']
     if len(objects) == 1:
         return objects[0]
+    elif len(objects) > 1:
+        multiple = True
     response = sf.query("""
         SELECT {}
         FROM Contact 
@@ -44,7 +51,10 @@ def getContact(email, dni):
     objects = response['records']
     if len(objects) == 1:
         return objects[0]
-    
+    elif len(objects) > 1:
+        multiple = True
+    if multiple:
+        raise MultipleContactsError()    
 class Socio(models.Model):
     nombre=models.CharField(max_length=200, null=True,blank=True)
     apellidos=models.CharField(max_length=200, null=True,blank=True)

@@ -3,6 +3,7 @@ from itertools import groupby
 
 from comun.ratelimitcache import ratelimit_post
 from django.contrib.auth.decorators import permission_required
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.mail import send_mail
 from django.core.validators import EmailValidator, ValidationError
 from django.db import connection, transaction
@@ -274,43 +275,50 @@ def envia_clave(request, tipo, clase_votantes):
     email = request.POST.get('email')
     if not email:
         return HttpResponseRedirect('/votacion_%s/' % tipo)
-    info = mv.getContact(email, email)
     msg = ''
-    if info:
-        num_socio = info[u'AlizeConstituentID__c']
-        income = info['Income_ultimos_12_meses_CONSEJO__c']
-        fecha_alta = parse_date(info['Activation_Date__c'])
-        today = datetime.date.today()
-        meses_active = min(12, diff_month(today, fecha_alta)) 
-        if income / meses_active < settings.MIN_INCOME / 12:
-            msg = u'''Parece que hay algún problema con el pago de tu cuota,
-            por favor, ponte en contacto con nuestra oficina, teléfono: 900 535 025,
-            correo electrónico:
-            <a href="mailto:sociasysocios.es@greenpeace.org">sociasysocios.es@greenpeace.org</a>.
-            Cuando esté resuelto, inténtalo de nuevo. Te esperamos.'''
-        if info['Birthdate']:
-            fecha_nacimiento = parse_date(info['Birthdate'])
-            if fecha_nacimiento > settings.FECHA_MAXIMA_NACIMIENTO:
-                msg = u'''Para poder participar en estas elecciones necesitabas ser mayor de edad
-                en el momento de la convocatoria. Te esperamos en las próximas elecciones'''
+    try:
+        info = mv.getContact(email, email)
+        if info:
+            num_socio = info[u'AlizeConstituentID__c']
+            income = info['Income_ultimos_12_meses_CONSEJO__c']
+            fecha_alta = parse_date(info['Activation_Date__c'])
+            today = datetime.date.today()
+            meses_active = min(12, diff_month(today, fecha_alta)) 
+            if income / meses_active < settings.MIN_INCOME / 12:
+                msg = u'''Parece que hay algún problema con el pago de tu cuota,
+                por favor, ponte en contacto con nuestra oficina, teléfono: 900 535 025,
+                correo electrónico:
+                <a href="mailto:sociasysocios.es@greenpeace.org">sociasysocios.es@greenpeace.org</a>.
+                Cuando esté resuelto, inténtalo de nuevo. Te esperamos.'''
+            if info['Birthdate']:
+                fecha_nacimiento = parse_date(info['Birthdate'])
+                if fecha_nacimiento > settings.FECHA_MAXIMA_NACIMIENTO:
+                    msg = u'''Para poder participar en estas elecciones necesitabas ser mayor de edad
+                    en el momento de la convocatoria. Te esperamos en las próximas elecciones'''
+            else:
+                msg = u'''Para poder votar necesitas tener fecha de nacimiento en la base de 
+                datos. Por favor, ponte en contacto con nuestra oficina, teléfono: 900 535 025, 
+                correo electrónico: sociasysocios.es@greenpeace.org o actualízala en
+                 Tu perfil greenpeace. Cuando esté resuelto, inténtalo de nuevo. Te esperamos.'''
+            try:
+                EmailValidator()(info['Email'])
+            except ValidationError:
+                msg = u'''Para poder votar electrónicamente, necesitamos que tengas una dirección de correo electrónico registrada en la base de datos de Greenpeace España para enviarte la clave. Por favor, ponte en contacto con nuestra oficina, teléfono: 900 535 025, correo electrónico: sociasysocios.es@greenpeace.org. Cuando esté resuelto, inténtalo de nuevo. Te esperamos.'''
+            if fecha_alta > settings.FECHA_CONVOCATORIA:
+                msg = u'''Para poder participar en estas elecciones necesitabas pertenecer a Greenpeace España en el momento de su convocatoria. Te esperamos en las próximas elecciones.'''
+            soc_local = mv.Socio.objects.filter(num_socio=num_socio).exclude(fecha_voto=None).first()
+            if soc_local:
+                msg = u'''El sistema tiene registrado tu voto en {:%d-%m-%Y %H:%M}'''.format(soc_local.fecha_voto)
         else:
-            msg = u'''Para poder votar necesitas tener fecha de nacimiento en la base de 
-            datos. Por favor, ponte en contacto con nuestra oficina, teléfono: 900 535 025, 
-            correo electrónico: sociasysocios.es@greenpeace.org o actualízala en
-             Tu perfil greenpeace. Cuando esté resuelto, inténtalo de nuevo. Te esperamos.'''
-        try:
-            EmailValidator()(info['Email'])
-        except ValidationError:
-            msg = u'''Para poder votar electrónicamente, necesitamos que tengas una dirección de correo electrónico registrada en la base de datos de Greenpeace España para enviarte la clave. Por favor, ponte en contacto con nuestra oficina, teléfono: 900 535 025, correo electrónico: sociasysocios.es@greenpeace.org. Cuando esté resuelto, inténtalo de nuevo. Te esperamos.'''
-        if fecha_alta > settings.FECHA_CONVOCATORIA:
-            msg = u'''Para poder participar en estas elecciones necesitabas pertenecer a Greenpeace España en el momento de su convocatoria. Te esperamos en las próximas elecciones.'''
-        soc_local = mv.Socio.objects.filter(num_socio=num_socio).exclude(fecha_voto=None).first()
-        if soc_local:
-            msg = u'''El sistema tiene registrado tu voto en {:%d-%m-%Y %H:%M}'''.format(soc_local.fecha_voto)
-    else:
-        msg = u'''No hay ninguna persona en nuestra base de datos que cumpla esta condición.
-        Por favor, ponte en contacto con nuestra oficina, teléfono: 900 535 025,
-        correo electrónico: <a href="mailto:sociasysocios.es@greenpeace.org">sociasysocios.es@greenpeace.org</a>.
+            msg = u'''No hay ninguna persona en nuestra base de datos que cumpla esta condición.
+            Por favor, ponte en contacto con nuestra oficina, teléfono: 900 535 025,
+            correo electrónico: <a href="mailto:sociasysocios.es@greenpeace.org">sociasysocios.es@greenpeace.org</a>.
+            Cuando esté resuelto, inténtalo de nuevo. Te esperamos.'''
+    except mv.MultipleContactsError:
+        info = None
+        msg = u'''Hay más de una persona en nuestra base de datos que cumple esta
+        condición.Por favor, ponte en contacto con nuestra oficina,
+        teléfono: 900 535 025, correo electrónico: sociasysocios.es@greenpeace.org.
         Cuando esté resuelto, inténtalo de nuevo. Te esperamos.'''
     
     if msg == '':
@@ -319,9 +327,12 @@ def envia_clave(request, tipo, clase_votantes):
         socio.nombre = info['Name']
         if info['MailingPostalCode']:
             prefijo = info['MailingPostalCode'][:2]
-            circunscripcion_por_cp = Provincia.objects.get(prefijo_cp=prefijo).circunscripcion
+            try:
+                circunscripcion_por_cp = Provincia.objects.get(prefijo_cp=prefijo).circunscripcion
+            except ObjectDoesNotExist:
+                circunscripcion_por_cp = Circunscripcion.objects.get(id=18)
         else:
-            circunscripcion_por_cp = Provincia.objects.get(id=18)
+            circunscripcion_por_cp = Circunscripcion.objects.get(id=18)
         socio.circunscripcion = circunscripcion_por_cp
         socio.save()
         email_text = u'Estimado/a %s\r\nÉsta es tu clave: %s\r\nPuedes votar en https://elecciones.greenpeace.es' % (socio.nombre, socio.get_clave())
