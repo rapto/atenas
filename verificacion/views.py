@@ -74,19 +74,7 @@ def index(request, tipo, clase_votante):
     buscado=request.GET.get('buscado',request.session.get('buscado', '' ))
     if isinstance(buscado,str):
         buscado=unicode(buscado,'utf8')
-    buscado=buscado.upper().strip()
-    buscado=buscado.replace(u'ñ',u'Ñ')
-    buscado=buscado.replace(u'á',u'A')
-    buscado=buscado.replace(u'é',u'É')
-    buscado=buscado.replace(u'í',u'I')
-    buscado=buscado.replace(u'ó',u'O')
-    buscado=buscado.replace(u'ú',u'U')
-    buscado=buscado.replace(u'Á',u'A')
-    buscado=buscado.replace(u'É',u'É')
-    buscado=buscado.replace(u'Í',u'I')
-    buscado=buscado.replace(u'Ó',u'O')
-    buscado=buscado.replace(u'Ú',u'U')
-
+    buscado=buscado.strip()
     request.session['buscado']=buscado
     buscado=buscado.encode('utf-8')
     if buscado:
@@ -99,8 +87,8 @@ def index(request, tipo, clase_votante):
             res=clase_votante.objects
             for palabra in buscado.split():
                 res=res.filter(
-                    Q(apellidos__icontains=palabra)
-                    | Q(nombre__icontains=palabra)
+                    Q(apellidos__unaccent__icontains=palabra)
+                    | Q(nombre__unaccent__icontains=palabra)
                 )
     else:
         res=[]
