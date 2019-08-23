@@ -391,8 +391,6 @@ def confirmar(request, tipo):
         candidato.tipo = tipo
         candidato.n_socio = 'n/a'
         socios = list(mv.Socio.objects.filter(num_socio=candidato.n_socio.zfill(8)))
-        socios += list(mv.Socio.objects.filter(num_socio_antiguo='S' + candidato.n_socio.zfill(7)))
-        socios += list(mv.Socio.objects.filter(num_socio_antiguo=candidato.n_socio))
         if len(socios) != 1:
             socios = mv.Socio.objects.filter(correo_electronico=candidato.correo_e)
         if len(socios) != 1:

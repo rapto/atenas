@@ -93,7 +93,6 @@ def index(request, tipo, clase_votante):
         if clase_votante is Socio:
             res=clase_votante.objects.filter(
                     Q(num_socio__contains=buscado)
-                    | Q(num_socio_antiguo__contains=buscado)
                     | Q(docu_id__contains=buscado)
                     )
         if clase_votante is Consejero or res.count()==0:

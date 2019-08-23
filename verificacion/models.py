@@ -63,7 +63,6 @@ class Socio(models.Model):
     apellidos=models.CharField(max_length=200, null=True,blank=True)
     docu_id=models.CharField(max_length=200,blank=True, verbose_name=u'Documento de identidad')
     num_socio=models.CharField(max_length=200, verbose_name=u'Número de socio/a')
-    num_socio_antiguo=models.CharField(max_length=200,blank=True, null=True, verbose_name=u'Número de socio/a antiguo')
     circunscripcion=models.ForeignKey(Circunscripcion, null=True,blank=True, verbose_name=u'Circunscripción')
     fecha_socio=models.DateTimeField(null=True,blank=True, verbose_name=u'Fecha antigüedad')
     fecha_voto=models.DateTimeField(null=True,blank=True)
