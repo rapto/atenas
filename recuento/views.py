@@ -247,10 +247,7 @@ def registrar_admin(request, ca, tipo):
         candidato=m.Candidato.objects.get(pk=aspa)
         #Sólo en caso de hostilidad
         assert candidato.circunscripcion.pk==circ.pk, u'Se está votando por candidatos de otra papeleta'
-        
-        voto=m.Voto(candidato=candidato)
-        papeleta.voto_set.add(voto)
-        voto.save()
+        papeleta.voto_set.create(candidato=candidato)
     if not id_usu and request.user.is_authenticated():
         return HttpResponseRedirect('./../')
     msg = u'<span style="font-size:300%;color:green;">Voto registrado</span>'
