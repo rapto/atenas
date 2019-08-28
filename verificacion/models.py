@@ -15,49 +15,63 @@ params = '''Name Income_ultimos_12_meses_CONSEJO__c
     Fecha_de_antiguedad__c Activation_Date__c s360a__ContactCodes__c
     s360a__ContactType__c'''.split()
 
+comma_params = ','.join(params)
+
 class MultipleContactsError(RuntimeError):
     pass
 
-def getContact(email, dni):
-    multiple = False
+def searchContacts(search_string):
     sf = Salesforce(**settings.SF_AUTH)
-    comma_params = ','.join(params)
+    response = sf.search('''find {{{}}} 
+        in name fields 
+        returning contact({} 
+            where s360a__ContactCodes__c = 'Active Donor')
+        limit 100    
+        '''.format(search_string, comma_params))
+    return response['searchRecords']
+    
+def getContact(email, dni, return_list=False):
+    limit = 100 if return_list else 2
+    ret = []
+    sf = Salesforce(**settings.SF_AUTH)
     response = sf.query("""
         SELECT {} 
         FROM Contact 
         WHERE Email ='{}'
         AND s360a__ContactCodes__c = 'Active Donor'
-        LIMIT 2 """.format(comma_params, email));
+        LIMIT {} """.format(comma_params, email, limit));
     objects = response['records']
-    if len(objects) == 1:
+    if len(objects) == 1 and not return_list:
         return objects[0]
-    elif len(objects) > 1:
-        multiple = True
+    else:
+        ret += objects
     response = sf.query("""
         SELECT {} 
         FROM Contact 
         WHERE DNI__c ='{}'
         AND s360a__ContactCodes__c = 'Active Donor'
-        LIMIT 2""".format(comma_params, dni));
+        LIMIT {} """.format(comma_params, dni, limit));
     objects = response['records']
-    if len(objects) == 1:
+    if len(objects) == 1 and not return_list:
         return objects[0]
-    elif len(objects) > 1:
-        multiple = True
+    else:
+        ret += objects
     response = sf.query("""
         SELECT {}
         FROM Contact 
         WHERE DNI__c ='{}'
         AND s360a__ContactCodes__c = 'Active Donor'
         AND  Email ='{}' 
-        LIMIT 2""".format(comma_params, dni, email));
+        LIMIT {} """.format(comma_params, dni, email, limit));
     objects = response['records']
     if len(objects) == 1:
         return objects[0]
-    elif len(objects) > 1:
-        multiple = True
-    if multiple:
-        raise MultipleContactsError()    
+    else:
+        ret += objects
+    if ret and not return_list:
+        raise MultipleContactsError()
+    return ret
+
 class Socio(models.Model):
     nombre=models.CharField(max_length=200, null=True,blank=True)
     apellidos=models.CharField(max_length=200, null=True,blank=True)
@@ -110,3 +124,35 @@ class Socio(models.Model):
             self.clave = claveAleatoria()
             self.save()
         return self.clave
+
+    @staticmethod
+    def buscaVotante(buscado):
+        try:
+            info = getContact(buscado, buscado)
+            if info:
+                num_socio = info[u'AlizeConstituentID__c']
+                income = info['Income_ultimos_12_meses_CONSEJO__c']
+                fecha_alta = parse_date(info['Activation_Date__c'])
+                today = datetime.date.today()
+                meses_active = min(12, diff_month(today, fecha_alta)) 
+                if income / meses_active < settings.MIN_INCOME / 12:
+                    msg = u'''Cuota insuficiente'''
+                if fecha_alta > settings.FECHA_CONVOCATORIA:
+                    msg = u'''Para poder participar en estas elecciones necesitabas pertenecer a Greenpeace España en el momento de su convocatoria. Te esperamos en las próximas elecciones.'''
+                if info['Birthdate']:
+                    fecha_nacimiento = parse_date(info['Birthdate'])
+                    if fecha_nacimiento > settings.FECHA_MAXIMA_NACIMIENTO:
+                        msg = u'''Menor de edad'''
+                elif fecha_alta > settings.FECHA_MAXIMA_NACIMIENTO:
+                    msg = u'''Sin info fecha nacimiento'''
+                soc_local = mv.Socio.objects.filter(num_socio=num_socio).exclude(fecha_voto=None).first()
+                if soc_local:
+                    msg = u'''El sistema tiene registrado tu voto en {:%d-%m-%Y %H:%M}'''.format(soc_local.fecha_voto)
+            else:
+                msg = u'''No encontrado'''
+        except mv.MultipleContactsError:
+            info = None
+            msg = u'''Hay más de una persona en nuestra base de datos que cumple esta
+            condición.Por favor, ponte en contacto con nuestra oficina,
+            teléfono: 900 535 025, correo electrónico: sociasysocios.es@greenpeace.org.
+            Cuando esté resuelto, inténtalo de nuevo. Te esperamos.'''
