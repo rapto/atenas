@@ -273,6 +273,22 @@ def envia_clave(request, tipo, clase_votantes):
     if not email:
         return HttpResponseRedirect('/votacion_%s/' % tipo)
     msg = ''
+    if tipo == 15:
+        try:
+            consejero = Consejero.objects.get(correo_electronico=email)
+            email_text = u'Estimado/a %s\r\nÉsta es tu clave: %s\r\nPuedes votar en https://elecciones.greenpeace.es' % (consejero.nombre, consejero.get_clave())
+            send_mail(u"[Greenpeace España/Elecciones] Clave para votar ", email_text, 'no-reply@greenpeace.es', [consejero.correo_electronico], 
+                fail_silently= False)
+            msg = u'Por favor, verifica tu buzón de correo. En breve te llegará un mensaje con la clave para votar.'
+            level = messages.SUCCESS
+        except ObjectDoesNotExist:
+            msg = u'''La votación está abierta solamente a los consejeros vigentes.
+                Verifica que tu dirección de correo es la activa de la lista del
+                Consejo'''
+            level = messages.WARNING
+        messages.add_message(request, level, msg)
+        return HttpResponseRedirect('/votacion_%s/' % tipo)
+            
     try:
         info = mv.getContact(email, email)
         if info:
@@ -359,7 +375,6 @@ def presentacion(request, tipo):
         form = form_class(request.POST, request.FILES) # A form bound to the POST data
         if form.is_valid():
             candidato = form.save(commit=False)
-            candidato.descripcion = candidato.descripcion or '-'
             candidato.tipo = 0
             if tipo == 15:
                 candidato.circunscripcion_id = 18
@@ -387,49 +402,12 @@ def confirmar(request, tipo):
     if request.method == 'POST': # If the form has been submitted...
         candidato.tipo = tipo
         candidato.n_socio = 'n/a'
-        socios = list(mv.Socio.objects.filter(num_socio=candidato.n_socio.zfill(8)))
-        if len(socios) != 1:
-            socios = mv.Socio.objects.filter(correo_electronico=candidato.correo_e)
-        if len(socios) != 1:
-            candidato.save()
-            envia_confirmacion(candidato)
-            return HttpResponseRedirect('/ok2_%s/' % tipo)
-        socio = socios[0]
-        
-        candidato.valida_sistema = True
-        candidato.fecha_alta = socio.fecha_socio
-        candidato.valida_sistema = True
-        if socio.fecha_nacimiento:
-            if socio.fecha_nacimiento > datetime.datetime(2013 - 18, 4, 21):
-                candidato.comentarios += '\nMenor de edad'
-                candidato.valida_sistema = False
-        else:
-            candidato.comentarios += '\nFecha de nacimiento no disponible'
-            candidato.valida_sistema = False
-
-        if not socio.corriente:
-            candidato.comentarios += '\nNo corriente'
-            candidato.valida_sistema = False
-        if tipo == 15:
-            fecha_alta_tope = datetime.datetime(2013 - 3, 4, 21)
-        else:
-            fecha_alta_tope = datetime.datetime(2013 - 3, 10, 20)
-        if socio.fecha_socio > fecha_alta_tope:
-            candidato.comentarios += '\nSocio demasiado reciente'
-            candidato.valida_sistema = False
-        if socio.circunscripcion != candidato.circunscripcion:
-            candidato.comentarios += u'\nNo coincide circunscripción'
-            candidato.valida_sistema = False
-            
         candidato.save()
         envia_confirmacion(candidato)
-        if candidato.valida_sistema:
-            return HttpResponseRedirect('/ok_%s/' % tipo)
         return HttpResponseRedirect('/ok2_%s/' % tipo)
     else:
         form = NuevoCandidatoConfirmacionForm(instance=candidato)
         if tipo == 15:
-            del form.fields['descripcion']
             del form.fields['circunscripcion']
         c = dict(form=form, candidato=candidato)
         for k in form.fields:
@@ -520,7 +498,9 @@ def editar_candidato(request, tipo, id_candidato):
                     candidato.fecha_alta = parse_date(info['Fecha_de_antiguedad__c'])
                     candidato.antiguedad_3a = candidato.fecha_alta <= settings.FECHA_MAXIMA_ANTIGUEDAD
                     candidato.save()
-                if info['MailingPostalCode']:
+                if tipo == 15:
+                    candidato.circunscripcion_correcta = True
+                elif info['MailingPostalCode']:
                     prefijo = info['MailingPostalCode'][:2]
                     circunscripcion_por_cp = Provincia.objects.get(prefijo_cp=prefijo).circunscripcion
                     candidato.circunscripcion_correcta = candidato.circunscripcion == circunscripcion_por_cp
