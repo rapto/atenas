@@ -448,13 +448,19 @@ def comision(request, tipo):
     if (not is_modulo_activo('comision_%s' % tipo) 
         and not request.user.is_superuser):
         return HttpResponseRedirect('/')
+    full = request.GET.get('full', False)
     candidatos = m.Candidato.objects.filter(tipo=tipo)
     candidatos_valida = candidatos.filter(valida=True).order_by('circunscripcion', 'fecha_alta')
     candidatos_novalida = candidatos.filter(valida=False).order_by('apellidos', 'nombre')
     candidatos_pendiente = candidatos.filter(valida__isnull=True).order_by('apellidos', 'nombre')
  
     ccaa = [(k, list(v)) for (k, v) in groupby(candidatos_valida, lambda x:x.circunscripcion)]
-    c = dict(ccaa=ccaa, candidatos_novalida=candidatos_novalida, candidatos_pendiente=candidatos_pendiente)
+    c = dict(
+            ccaa=ccaa, 
+            candidatos_novalida=candidatos_novalida,
+            candidatos_pendiente=candidatos_pendiente,
+            full=full,
+        )
     return render(request, 'admin_candidatos.html', c)
 
 @ratelimit_post(minutes = 3, requests = 10)

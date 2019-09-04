@@ -14,7 +14,16 @@ Elecciones al Consejo de Greenpeace España - Gestión de candidaturas
 
     {% for candidato in candidatos %}
     <p>
-    <p class="foto">{% if candidato.foto %}<img src="{% thumbnail candidato.foto 100x100 %}">{% endif %}</p>
+    <p class="foto">
+        {% if candidato.foto %}
+            {% if full %}
+                <img src="{{ candidato.foto.url }}">
+            {% else %}
+                <img src="{% thumbnail candidato.foto 100x100 %}">
+            {% endif %}
+        {% endif %}
+    </p>
+
     <p class="nombre"><span class="nombre"><a href="./{{candidato.id}}/">{{ candidato }}</a></span>
         <span><a href="mailto:{{candidato.correo_e}}">{{candidato.correo_e}}</a></span>
         <span>Localidad: {{ candidato.localidad }}</span>
