@@ -91,7 +91,7 @@ def index(request, tipo, clase_votante):
                 fecha_alta = parse_date(info['Activation_Date__c'])
                 socio, _ = Socio.objects.get_or_create(num_socio=num_socio)
                 socio.correo_electronico = info['Email']
-                socio.docu_id = info['DNI__c']
+                socio.docu_id = info['DNI__c'] or 'n/a'
                 socio.fecha_nacimiento = info['Birthdate']
                 socio.nombre = info['Name']
                 if info['MailingPostalCode']:
