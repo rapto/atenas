@@ -111,7 +111,7 @@ def index(request, tipo, clase_votante):
                 res=res.filter(
                     Q(apellidos__unaccent__icontains=palabra)
                     | Q(nombre__unaccent__icontains=palabra)
-                ).limit(100)
+                )[:100]
     else:
         res=[]
     if tipo == 15:
