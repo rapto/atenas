@@ -4,6 +4,7 @@ import datetime
 from django.db import models
 from django.contrib.auth.models import User
 from django.conf import settings
+from django.utils.timezone import get_default_timezone
 
 from simple_salesforce import Salesforce
 
@@ -87,7 +88,7 @@ class Socio(models.Model):
     clave=models.CharField(max_length=50, null=True, blank=True)
 
     def fecha_voto_legible(self):
-        return self.fecha_voto.strftime("%H:%M %d-%m-%Y")
+        return self.fecha_voto and self.fecha_voto.astimezone(get_default_timezone()).strftime("%H:%M %d-%m-%Y")
 
     def fecha_nacimiento_legible(self):
         if self.fecha_nacimiento:
