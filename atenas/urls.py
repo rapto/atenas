@@ -13,7 +13,7 @@ Including another URLconf
     1. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
 from django.conf import settings
-from django.conf.urls import include, url
+from django.conf.urls import include, url, static
 from django.views.generic import RedirectView, TemplateView
 from django.contrib import admin
 import os
@@ -63,8 +63,6 @@ urlpatterns = [
     url(r'^ok_60/$', recuento.views.ok_60),
     url(r'^ok2_60/$', recuento.views.casi_ok_60),
     url(r'^ver_plazos/$', TemplateView.as_view(template_name='no_hay_nada.html'), name='ver_plazos'),
-#    url(r'^static/(.*)$', 'django.views.static.serve', {'document_root': os.path.join(SITE_ROOT,'static')}),
-#    url(r'^media/(.*)$', django.views.static.serve, {'document_root': settings.MEDIA_ROOT}),
     url(r'^papeleta_60/(?P<ca>\d+)/$', recuento.views.papeleta_usu_60),
     url(r'^papeleta_60/(?P<ca>\d+)/registrar/$', recuento.views.registrar_usu_60),
     url(r'^papeleta_15/(?P<ca>\d+)/$', recuento.views.papeleta_usu_15),
@@ -91,3 +89,5 @@ urlpatterns = [
     url(r'^atenas_60/verificacion/registrar/(?P<id_socio>\d+)/ok/$', verificacion.views.registrarOK_60),
     url(r'^atenas_60/verificacion/registroKO/(?P<id_socio>\d+)/$', verificacion.views.registrarKO_60),
 ]
+if settings.DEBUG:
+    urlpatterns += static.static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
