@@ -171,7 +171,7 @@ def registrar_usu(request,ca, tipo, clase_votantes):
         assert usu.circunscripcion_id==18 or circ.pk==usu.circunscripcion_id, 'Se está votando por una circ no autorizada'
     puedeVotar, msg = usu.puedeVotar(True)
     if not puedeVotar:
-        messages.add_message(request, messages.WARN, 'No puede votar: '+msg)
+        messages.add_message(request, messages.WARNING, 'No puede votar: '+msg)
         return HttpResponseRedirect('/')
     usu.fecha_voto=datetime.datetime.now()
     usu.save()
