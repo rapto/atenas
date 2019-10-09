@@ -29,7 +29,7 @@ class Circunscripcion(models.Model):
             return 'n/a'
 
     def candidatos_ordenados(self):
-        return self.candidato_set.filter(valida=True).order_by('fecha_alta')
+        return self.candidato_set.filter(valida=True, tipo__gt=0).order_by('fecha_alta')
 
     def candidatos_ordenados_por_voto(self):
         ret = list(self.candidato_set.filter(valida=True, tipo__gt=0))
